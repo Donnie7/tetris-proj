@@ -50,10 +50,11 @@
 
 (defun tabuleiro-altura-coluna (tab c)
 	(let* ((linhas (array-dimension tab 0))
-	       (i linhas ))
-	   (dotimes (l linhas)
-	       (cond ((eq (aref tab l c) T) (return)))
-	       (decf i 1))
+	       (i linhas))
+	      (dotimes (l linhas)
+	          (cond ((eq (aref tab (- (- linhas 1) l) c) T)
+			     (return)))
+	          (decf i 1))
 	  i))
 
 (defun tabuleiro-linha-completa-p (tab l)
@@ -83,4 +84,4 @@
                            (setf topo-preenchido T)(return))))
           topo-preenchido))
 
-(load "utils.fas")
+;(load "utils.fas")
