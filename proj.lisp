@@ -82,9 +82,14 @@
 	      (
 |#
 
-(defun solucao (a))
-(defun accoes (a))
-(defun resultado (a b))
-(defun custo-oportunidade (a))
+(defun solucao (a)
+	a)
+(defun accoes (a)
+	a)
+(defun resultado (a b)
+	(a b))
+(defun custo-oportunidade (a)
+	a)
 
 (load "utils.lisp")
+	
