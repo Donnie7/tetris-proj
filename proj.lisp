@@ -1,10 +1,7 @@
-;#######################################
-;variaveis globais
-;#######################################
-(setf l-tabuleiro 18)
-(setf c-tabuleiro 10)
-
-
+; Gabriel Calmeiro 57774
+; Ricardo Afonso 71070 
+; Marco Tomas 65921
+; Grupo TG 14
 ;#######################################
 ;2.1.1 Tipo Accao
 ;#######################################
@@ -22,7 +19,7 @@
 ;2.1.2 Tipo Tabuleiro
 ;#######################################
 (defun cria-tabuleiro ()
-	(make-array (list l-tabuleiro c-tabuleiro)))
+	(make-array (list 18 10)))
 
 (defun copia-tabuleiro (tab)
 	(let* ((linhas (array-dimension tab 0))
