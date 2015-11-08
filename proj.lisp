@@ -73,7 +73,20 @@
 		    ((< l 0)nil) 
 		    ((> l (- linhas 1))nil)
 		    ((setf (aref tab l c) T)T)))) 
-		     
+
+(defun tabuleiro-remove-linha! (tab l)
+	(let* ((linhas (array-dimension tab 0))
+	       (colunas (array-dimension tab 1))
+	       (linha-acima (+ l 1)))
+	      (loop
+		   (when (> linha-acima (- linhas 1)) (return))
+		   (dotimes (c colunas)
+	  		(setf (aref tab l c) (aref tab linha-acima c)))
+		   (incf l 1)
+		   (incf linha-acima 1))
+	      (dotimes (c colunas)
+		   (setf (aref tab (- linhas 1) c) nil))))
+	      		     
 
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
