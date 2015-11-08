@@ -83,4 +83,13 @@
                            (setf topo-preenchido T)(return))))
           topo-preenchido))
 
+<<<<<<< HEAD
 ;(load "utils.fas")
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
+(load "utils.fas")
+	
+>>>>>>> refs/remotes/origin/master
