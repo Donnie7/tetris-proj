@@ -1,11 +1,4 @@
 ;#######################################
-;variaveis globais
-;#######################################
-(setf l-tabuleiro 18)
-(setf c-tabuleiro 10)
-
-
-;#######################################
 ;2.1.1 Tipo Accao
 ;#######################################
 (defun cria-accao (int array)
@@ -22,7 +15,7 @@
 ;2.1.2 Tipo Tabuleiro
 ;#######################################
 (defun cria-tabuleiro ()
-	(make-array (list l-tabuleiro c-tabuleiro)))
+	(make-array (list 18 10)))
 
 (defun copia-tabuleiro (tab)
 	(let* ((linhas (array-dimension tab 0))
