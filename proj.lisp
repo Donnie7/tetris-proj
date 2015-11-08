@@ -73,7 +73,7 @@
 		    ((> l (- linhas 1))nil)
 		    ((setf (aref tab l c) T)T)))) 
 		     
-Ü
+
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
 	       (linhas (array-dimension tab 0))
@@ -83,13 +83,4 @@
                            (setf topo-preenchido T)(return))))
           topo-preenchido))
 
-<<<<<<< HEAD
-;(load "utils.fas")
-=======
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 (load "utils.fas")
-	
->>>>>>> refs/remotes/origin/master
