@@ -2,7 +2,7 @@
 ;variaveis globais
 ;#######################################
 (setf l-tabuleiro 18)
-(setf c-tabuleiro 1)
+(setf c-tabuleiro 10)
 
 
 ;#######################################
@@ -39,7 +39,26 @@
 	(let* ((linhas (array-dimension tab 0))
 	       (i linhas ))
 	   (dotimes (l linhas)
-	       (cond ((eq (aref tab l c) T) (decf i 1)(return)))
+	       (cond ((eq (aref tab l c) T) (return)))
 	       (decf i 1))
 	  i))
+
+(defun tabuleiro-linha-completa-p (tab l)
+	(let* ((colunas (array-dimension tab 1))
+	       (linha-total T))
+	    (dotimes (c colunas)
+		(cond ((eq (aref tab l c) nil) 
+			   (setf linha-total nil)(return))))
+	  linha-total))
+
+(defun tabuleiro-preenche! (tab l c)
+	(let* ((linhas (array-dimension tab 0))
+	       (colunas (array-dimension tab 1))
+	       (res 'passed))
+	      (cond ((< c 0)nil)
+		    ((> c (- colunas 1))nil)
+		    ((< l 0)nil) 
+		    ((> l (- linhas 1))nil)
+		    ((setf (aref tab l c) T)T)))) 
+		     
 
