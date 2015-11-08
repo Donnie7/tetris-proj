@@ -88,7 +88,8 @@
 	a)
 (defun resultado (a b)
 	(let* ((r a)
-	       (s b))))
+	       (s b))
+	(setf r (+ a b s r))))
 (defun custo-oportunidade (a)
 	a)
 
