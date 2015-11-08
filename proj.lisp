@@ -3,6 +3,22 @@
 ; Ricardo Afonso 71070 
 ; Marco Tomas 65921
 ; Grupo TG 14
+
+
+(defstruct estado
+        pontos
+        pecas-por-colocar
+        pecas-colocadas
+        tabuleiro)
+
+(defstruct problema
+        estado-inicial
+        solucao 
+        accoes
+        resultado
+        custo-caminho)
+
+
 ;#######################################
 ;2.1.1 Tipo Accao
 ;#######################################
@@ -51,12 +67,24 @@
 
 (defun tabuleiro-preenche! (tab l c)
 	(let* ((linhas (array-dimension tab 0))
-	       (colunas (array-dimension tab 1))
-	       (res 'passed))
+	       (colunas (array-dimension tab 1)))
 	      (cond ((< c 0)nil)
 		    ((> c (- colunas 1))nil)
 		    ((< l 0)nil) 
 		    ((> l (- linhas 1))nil)
 		    ((setf (aref tab l c) T)T)))) 
 		     
+#|
+(defun foo (tab l)
+	(let* ((linhas (array-dimension tab ))
+	       (colunas (array-dimension tab 1))
+	       (i linhas))
+	      (
+|#
 
+(defun solucao (a))
+(defun accoes (a))
+(defun resultado (a b))
+(defun custo-oportunidade (a))
+
+(load "utils.lisp")

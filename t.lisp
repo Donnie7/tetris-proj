@@ -1,5 +1,6 @@
 
 (load "proj.lisp")
+(load "utils.lisp")
 
 ;;; definicao das configuracoes possiveis para cada peca
 ;;peca i 
