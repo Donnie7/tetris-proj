@@ -97,4 +97,14 @@
                            (setf topo-preenchido T)(return))))
           topo-preenchido))
 
+(defun tabuleiros-iguais-p (t1 t2)
+	(let* ((c (* (array-dimension t1 0)
+		     (array-dimension t1 1)))
+	       (res T))
+	      (dotimes (l c)
+		     (cond ((not (eq (row-major-aref t1 l)
+				     (row-major-aref t2 l)))
+			    (setf res nil)(return))))
+	      res))
+
 ;(load "utils.fas")
