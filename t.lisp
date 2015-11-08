@@ -1,3 +1,4 @@
+
 (load "proj.lisp")
 
 ;;; definicao das configuracoes possiveis para cada peca
@@ -34,3 +35,70 @@
 (setf c (accao-coluna a))
 (setf d (accao-peca a))
 
+(setf e (cria-tabuleiro))
+(setf f (cria-tabuleiro-p))
+
+;s e uma copia de f
+(setf s (copia-tabuleiro f))
+
+;arr e um array simples 1A
+(setf arr (make-array 5 :initial-contents '(0 1 2 3 4)))
+
+
+
+
+;;############################################
+;;############## TESTES ######################
+
+
+;TESTE 1
+;antes de alterar f, tabuleiro-preenchido-p devera devolver 
+;nil
+(setf t1 (eq (tabuleiro-preenchido-p f 2 4) nil))
+
+;TESTE 2
+;altera a posicao 2 4 de f para T
+(setf (aref f 2 4) T)
+;depois da posicao de f alterada devera retornar T
+(setf t2 (eq (tabuleiro-preenchido-p f 2 4) T))
+
+;TESTE 3
+;valida a altura de todas as colunas
+(setf t3-1 (= (tabuleiro-altura-coluna f 0) 0))
+(setf t3-2 (= (tabuleiro-altura-coluna f 1) 0))
+(setf t3-3 (= (tabuleiro-altura-coluna f 4) 15))
+(setf t3-4 (= (tabuleiro-altura-coluna f 9) 0))
+
+;TESTE 4
+;valida a altura depois de alteradas algumas posicoes no 
+;tabuleiro de vazias para preenchidas
+(setf (aref f 0 0) T)
+(setf (aref f 9 9) T)
+(setf t4-1 (= (tabuleiro-altura-coluna f 0) 17))
+(setf t4-2 (= (tabuleiro-altura-coluna f 9) 8))
+(setf (aref f 17 9) T)
+(setf t4-3 (= (tabuleiro-altura-coluna f 9) 8))
+
+
+
+
+
+
+
+; lista de testes
+(setf test-list 
+	(list 
+t1 
+t2 
+t3-1
+t3-2 
+t3-3 
+t3-4 
+t4-1
+t4-2))
+
+; avalia testes
+(defun testes ()
+	(loop for x in test-list
+		do (if x (print 'passed) (print 'failed)))
+'DONE)
