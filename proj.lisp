@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 ; Gabriel Calmeiro 57774
 ; Ricardo Afonso 71070 
 ; Marco Tomas 65921
 ; Grupo TG 14
+=======
+>>>>>>> origin/master
 ;#######################################
 ;2.1.1 Tipo Accao
 ;#######################################
