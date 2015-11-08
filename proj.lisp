@@ -82,16 +82,6 @@
 	      (
 |#
 
-(defun solucao (a)
-	a)
-(defun accoes (a)
-	a)
-(defun resultado (a b)
-	(let* ((r a)
-	       (s b))
-	(setf r (+ a b s r))))
-(defun custo-oportunidade (a)
-	a)
 
-(load "utils.lisp")
+(load "utils.fas")
 	
