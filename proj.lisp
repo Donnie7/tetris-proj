@@ -87,7 +87,8 @@
 (defun accoes (a)
 	a)
 (defun resultado (a b)
-	(a b))
+	(let* ((r a)
+	       (s b))))
 (defun custo-oportunidade (a)
 	a)
 
