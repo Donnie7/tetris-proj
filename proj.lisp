@@ -75,23 +75,15 @@
 		    ((setf (aref tab l c) T)T)))) 
 		     
 #|
-(defun foo (tab l)
-	(let* ((linhas (array-dimension tab ))
-	       (colunas (array-dimension tab 1))
-	       (i linhas))
-	      (
+(defun tabuleiro-topo-preenchido-p (tab)
+        (let* ((colunas (array-dimension tab 1))
+	       (linhas (array-dimension tab 0))
+	       (topo-preenchido nil))
+            (dotimes (c colunas)
+                (cond ((eq (aref tab (- linhas 1) c) T)
+                           (setf topo-preenchido T)(return))))
+          topo-preenchido))
 |#
 
-(defun solucao (a)
-	a)
-(defun accoes (a)
-	a)
-(defun resultado (a b)
-	(let* ((r a)
-	       (s b))
-	(setf r (+ a b s r))))
-(defun custo-oportunidade (a)
-	a)
-
-(load "utils.lisp")
+(load "utils.fas")
 	
