@@ -86,7 +86,6 @@
 		   (incf linha-acima 1))
 	      (dotimes (c colunas)
 		   (setf (aref tab (- linhas 1) c) nil))))
-	      		     
 
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
@@ -95,7 +94,7 @@
             (dotimes (c colunas)
                 (cond ((eq (aref tab (- linhas 1) c) T)
                            (setf topo-preenchido T)(return))))
-          topo-preenchido))
+          topo-preenchido))	      		     
 
 (defun tabuleiros-iguais-p (t1 t2)
 	(let* ((c (* (array-dimension t1 0)
@@ -112,5 +111,26 @@
 
 (defun array->tabuleiro (tab)
 	(copia-tabuleiro tab))
+
+
+(defun copia-estado (e1)
+	(copy-estado e1))
+
+(defun estados-iguais-p (e1 e2)
+   (let* ((res T))
+      (cond ((not (= (estado-pontos e1)
+     	 	      (estado-pontos e2))) (setf res nil))
+	    ((not (equal (estado-pecas-por-colocar e1)
+			(estado-pecas-por-colocar e2))) (setf res nil))
+	    ((not (equal (estado-pecas-colocadas e1)
+                        (estado-pecas-colocadas e2))) (setf res nil))
+	    ((not (tabuleiros-iguais-p
+			 (estado-tabuleiro e1)
+			 (estado-tabuleiro e2))) (setf res nil)))
+      res))
+
+(defun estado-final-p (e)
+	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
+	    (null (estado-pecas-por-colocar e))))
 
 ;(load "utils.fas")
