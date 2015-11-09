@@ -120,10 +120,28 @@
 ;#######################################
 
 (defun copia-estado (e1)
-	(copy-estado e1))
+	(let* ((e (make-estado)))
+	   (setf (estado-pontos e) (estado-pontos e1))
+	   (setf (estado-pecas-por-colocar e) (copy-list (estado-pecas-por-colocar e1)))
+	   (setf (estado-pecas-colocadas e) (copy-list (estado-pecas-colocadas e1)))
+	   (setf (estado-tabuleiro e) (copia-tabuleiro (estado-tabuleiro e1)))
+   e))
+	   
+
 
 (defun estados-iguais-p (e1 e2)
-	(equalp e1 e2))
+   (let* ((res T))
+      (cond ((not (= (estado-pontos e1)
+     	 	      (estado-pontos e2))) (setf res nil))
+	    ((not (equalp (estado-pecas-por-colocar e1)
+		(estado-pecas-por-colocar e2))) (setf res nil))
+	    ((not (equalp (estado-pecas-colocadas e1)
+                        (estado-pecas-colocadas e2))) (setf res nil))
+	    ((not (tabuleiros-iguais-p
+			 (estado-tabuleiro e1)
+			 (estado-tabuleiro e2))) (setf res nil)))
+      res))
+
 
 (defun estado-final-p (e)
 	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
@@ -175,4 +193,5 @@
 (defun qualidade (e)
 	(- (estado-pontos e)))
 
-;(load "utils.fas")
+
+(load "utils.fas")
