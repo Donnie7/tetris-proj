@@ -100,10 +100,11 @@
 	(let* ((c (* (array-dimension t1 0)
 		     (array-dimension t1 1)))
 	       (res T))
+	      (if (null t2) nil
 	      (dotimes (l c)
 		     (cond ((not (eq (row-major-aref t1 l)
 				     (row-major-aref t2 l)))
-			    (setf res nil)(return))))
+			    (setf res nil)(return)))))
 	      res))
 
 (defun tabuleiro->array (tab)
@@ -132,5 +133,46 @@
 (defun estado-final-p (e)
 	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
 	    (null (estado-pecas-por-colocar e))))
+
+(defun solucao (e)
+	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro e)))
+		    (null (estado-pecas-por-colocar e))))
+
+
+(defun roda-peca (peca)
+	(let* ((l (array-dimension peca 0))
+	       (c (array-dimension peca 1))
+	       (nova-peca (make-array (list c l) :initial-element 0)))
+	 (loop for coluna from 0 below c do
+		(loop for linha from 0 below l do
+		    (setf (aref nova-peca coluna linha)
+			  (aref peca (- (- l linha) 1) coluna))))
+	nova-peca))
+
+(defun testa-limites-laterais (tab accao)
+	(let* ((c (-(array-dimension tab 1) 1))
+	       (largura-peca (array-dimension (cdr accao) 1)))
+	  (<= (+ (car accao) (- largura-peca 1)) c)))
+
+(defun accoes (e)
+	(let* ((res ())
+	       (peca-inicial (car (estado-pecas-por-colocar e)))
+	       (peca-rodada nil)
+	       (res-peca-rodada peca-inicial)
+	       (larg-t (array-dimension (estado-tabuleiro e) 1))
+	       (c 0))
+	 (loop
+	     (when (not (tabuleiros-iguais-p peca-inicial peca-rodada)) (return))
+             (dotimes (n larg-t)
+                 (when (not (testa-limites-laterais (estado-tabuleiro e) (cria-accao c res-peca-rodada))) (return))
+      		 (cons (cria-accao c res-peca-rodada) res)
+		 (print n)
+		 (setf c n))
+	     (setf c 0)
+		 (print 'gggg)
+	     (setf peca-rodada (roda-peca res-peca-rodada))
+	     (setf res-peca-rodada peca-rodada))
+    (reverse res)))
+
 
 ;(load "utils.fas")
