@@ -113,6 +113,9 @@
 (defun array->tabuleiro (tab)
 	(copia-tabuleiro tab))
 
+;#######################################
+;2.1.1 Tipo Estado
+;#######################################
 
 (defun copia-estado (e1)
 	(copy-estado e1))
@@ -173,4 +176,9 @@
     (reverse res)))
 
 
-(load "utils.fas")
+;#######################################
+;2.1.1 Funcoes do problema de procura
+;#######################################
+
+
+;(load "utils.fas")
