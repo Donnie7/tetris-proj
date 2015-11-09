@@ -107,4 +107,10 @@
 			    (setf res nil)(return))))
 	      res))
 
+(defun tabuleiro->array (tab)
+	(copia-tabuleiro tab))
+
+(defun array->tabuleiro (tab)
+	(copia-tabuleiro tab))
+
 ;(load "utils.fas")
