@@ -166,13 +166,11 @@
              (dotimes (n larg-t)
                  (when (not (testa-limites-laterais (estado-tabuleiro e) (cria-accao c res-peca-rodada))) (return))
       		 (cons (cria-accao c res-peca-rodada) res)
-		 (print n)
 		 (setf c n))
 	     (setf c 0)
-		 (print 'gggg)
 	     (setf peca-rodada (roda-peca res-peca-rodada))
 	     (setf res-peca-rodada peca-rodada))
     (reverse res)))
 
 
-;(load "utils.fas")
+(load "utils.fas")
