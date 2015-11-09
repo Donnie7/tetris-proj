@@ -100,11 +100,13 @@
 	(let* ((c (* (array-dimension t1 0)
 		     (array-dimension t1 1)))
 	       (res T))
-	      (if (null t2) nil
-	      (dotimes (l c)
+	      (cond
+		 ( (null t2) (setf res nil))
+		 
+	      ((dotimes (l c)
 		     (cond ((not (eq (row-major-aref t1 l)
 				     (row-major-aref t2 l)))
-			    (setf res nil)(return)))))
+			    (setf res nil)(return))))))
 	      res))
 
 (defun tabuleiro->array (tab)
@@ -121,17 +123,7 @@
 	(copy-estado e1))
 
 (defun estados-iguais-p (e1 e2)
-   (let* ((res T))
-      (cond ((not (= (estado-pontos e1)
-     	 	      (estado-pontos e2))) (setf res nil))
-	    ((not (equal (estado-pecas-por-colocar e1)
-			(estado-pecas-por-colocar e2))) (setf res nil))
-	    ((not (equal (estado-pecas-colocadas e1)
-                        (estado-pecas-colocadas e2))) (setf res nil))
-	    ((not (tabuleiros-iguais-p
-			 (estado-tabuleiro e1)
-			 (estado-tabuleiro e2))) (setf res nil)))
-      res))
+	(equalp e1 e2))
 
 (defun estado-final-p (e)
 	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
@@ -165,20 +157,22 @@
 	       (larg-t (array-dimension (estado-tabuleiro e) 1))
 	       (c 0))
 	 (loop
-	     (when (not (tabuleiros-iguais-p peca-inicial peca-rodada)) (return))
+	     (when (tabuleiros-iguais-p peca-inicial peca-rodada) (return))
              (dotimes (n larg-t)
                  (when (not (testa-limites-laterais (estado-tabuleiro e) (cria-accao c res-peca-rodada))) (return))
-      		 (cons (cria-accao c res-peca-rodada) res)
-		 (setf c n))
+      		 (setf res (cons (cria-accao c res-peca-rodada) res))
+		 (setf c (+ n 1)))
 	     (setf c 0)
 	     (setf peca-rodada (roda-peca res-peca-rodada))
-	     (setf res-peca-rodada peca-rodada))
-    (reverse res)))
+	     (setf res-peca-rodada (roda-peca res-peca-rodada)))
+	(reverse res)))
 
 
 ;#######################################
 ;2.1.1 Funcoes do problema de procura
 ;#######################################
 
+(defun qualidade (e)
+	(- (estado-pontos e)))
 
 ;(load "utils.fas")
