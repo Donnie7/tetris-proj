@@ -194,4 +194,5 @@
 	(- (estado-pontos e)))
 
 
-(load "utils.fas")
+
+;(load "utils.fas")
