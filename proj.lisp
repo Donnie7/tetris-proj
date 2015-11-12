@@ -17,6 +17,11 @@
         resultado
         custo-caminho)
 
+(defun largura-peca (peca)
+	(array-dimension peca 1))
+
+(defun altura-peca (peca)
+	(array-dimension peca 0))
 
 ;#######################################
 ;2.1.1 Tipo Accao
@@ -147,6 +152,10 @@
 	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
 	    (null (estado-pecas-por-colocar e))))
 
+
+;#######################################
+;2.1.1 Funcoes do problema de procura
+;#######################################
 (defun solucao (e)
 	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro e)))
 		    (null (estado-pecas-por-colocar e))))
@@ -164,8 +173,8 @@
 
 (defun testa-limites-laterais (tab accao)
 	(let* ((c (-(array-dimension tab 1) 1))
-	       (largura-peca (array-dimension (cdr accao) 1)))
-	  (<= (+ (car accao) (- largura-peca 1)) c)))
+	       (larg-peca (largura-peca (cdr accao))))
+	  (<= (+ (car accao) (- larg-peca 1)) c)))
 
 (defun accoes (e)
 	(let* ((res ())
@@ -186,9 +195,6 @@
 	(reverse res)))
 
 
-;#######################################
-;2.1.1 Funcoes do problema de procura
-;#######################################
 
 (defun qualidade (e)
 	(- (estado-pontos e)))
