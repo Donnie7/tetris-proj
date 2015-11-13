@@ -17,10 +17,10 @@
         resultado
         custo-caminho)
 
-(defun largura-peca (peca)
+(defun largura-matriz (peca)
 	(array-dimension peca 1))
 
-(defun altura-peca (peca)
+(defun altura-matriz (peca)
 	(array-dimension peca 0))
 
 ;#######################################
@@ -48,7 +48,8 @@
 	       (novo-array (make-array (list linhas colunas) :initial-element T)))
 	  (dotimes (l linhas)
 	      (dotimes (c colunas)
-		   (setf (aref novo-array l c) (aref tab l c))))novo-array))
+		   (setf (aref novo-array l c) (aref tab l c))))
+	  novo-array))
 		
 (defun tabuleiro-preenchido-p (tab l c)
 	(eq (aref tab l c) 'T))
@@ -173,7 +174,7 @@
 
 (defun testa-limites-laterais (tab accao)
 	(let* ((c (-(array-dimension tab 1) 1))
-	       (larg-peca (largura-peca (cdr accao))))
+	       (larg-peca (largura-matriz (cdr accao))))
 	  (<= (+ (car accao) (- larg-peca 1)) c)))
 
 (defun accoes (e)
@@ -194,6 +195,24 @@
 	     (setf res-peca-rodada (roda-peca res-peca-rodada)))
 	(reverse res)))
 
+(defun espaco-vazio-peca-ultimas-linhas-p (tab peca col)
+	(let* ((alt-tab (altura-matriz tab))
+		   (l-peca (largura-matriz peca))
+		   (a-peca (altura-matriz peca))
+		   (res T))
+		   		    (format t "alt-tab:~D~%" alt-tab)
+		   		    (format t "l-peca:~D~%" l-peca)
+		   		    (format t "a-peca:~D~%" a-peca)
+		  (dotimes (l l-peca)
+		   		    (format t "1st loop l =:~D~%" l)
+		  		(dotimes (a a-peca)
+		   		    (format t "2st loop a =:~D~%" a)
+		   		    (format t "aref l:~D~% c:~D~%" (- alt-tab a 1) (+ col a))
+		  			(if (eq (aref tab (- alt-tab a 1) (+ col l)) T)
+		  				(setf res nil))
+		  		)
+		  )
+		  res))
 
 
 (defun qualidade (e)
