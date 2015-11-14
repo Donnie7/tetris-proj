@@ -161,7 +161,7 @@
 	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro e)))
 		    (null (estado-pecas-por-colocar e))))
 
-
+#|
 (defun roda-peca (peca)
 	(let* ((l (array-dimension peca 0))
 	       (c (array-dimension peca 1))
@@ -171,6 +171,28 @@
 		    (setf (aref nova-peca coluna linha)
 			  (aref peca (- (- l linha) 1) coluna))))
 	nova-peca))
+|#
+
+(defun roda-peca (peca)
+	(cond ((equalp peca peca-i0) peca-i1)
+		  ((equalp peca peca-i1) peca-i0)
+		  ((equalp peca peca-l0) peca-l1)
+		  ((equalp peca peca-l1) peca-l2)
+		  ((equalp peca peca-l2) peca-l3)
+		  ((equalp peca peca-l3) peca-l0)
+		  ((equalp peca peca-j0) peca-j1)
+		  ((equalp peca peca-j1) peca-j2)
+		  ((equalp peca peca-j2) peca-j3)
+		  ((equalp peca peca-j3) peca-j0)
+		  ((equalp peca peca-o0) peca-o0)
+		  ((equalp peca peca-s0) peca-s1)
+		  ((equalp peca peca-s1) peca-s0)
+		  ((equalp peca peca-z0) peca-z1)
+		  ((equalp peca peca-z1) peca-z0)
+		  ((equalp peca peca-t0) peca-t1)
+		  ((equalp peca peca-t1) peca-t2)
+		  ((equalp peca peca-t2) peca-t3)
+		  ((equalp peca peca-t3) peca-t0)))
 
 (defun testa-limites-laterais (tab accao)
 	(let* ((c (-(array-dimension tab 1) 1))
@@ -203,7 +225,12 @@
 		  (dotimes (l l-peca)
 		  		(if (eq res nil)(return))
 		  		(dotimes (a a-peca)
-		  			(if (eq (aref tab (- alt-tab a 1) (+ col l)) T)
+		  			;(format t "~%l-tab ~D: " (- alt-tab a 1))
+		  			;(format t "~%c-tab ~D: " (+ col l))
+		  			;(format t "~%->>>l-peca ~D: " l)
+		  			;(format t "~%->>>c-peca ~D: " (- a-peca a))
+		  			(if (and (eq (aref tab (- alt-tab a 1) (+ col l)) T)
+		  					 (eq (aref peca l (- a-peca a 1)) T))
 		  				(progn
 		  					(setf res nil)
 		  					(return)))
@@ -217,4 +244,4 @@
 
 
 
-;(load "utils.fas")
+;(load "utils.fas")?
