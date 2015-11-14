@@ -217,20 +217,23 @@
 	     (setf res-peca-rodada (roda-peca res-peca-rodada)))
 	(reverse res)))
 
-(defun espaco-vazio-peca-ultimas-linhas-p (tab peca col)
-	(let* ((alt-tab (altura-matriz tab))
+
+;;; espaco-vazio-peca-ultimas-linhas-p 
+
+(defun peca-encaixa-p (tab peca col)
+	(let* ((alt-tab (- (altura-matriz tab) 1))
 		   (l-peca (largura-matriz peca))
 		   (a-peca (altura-matriz peca))
 		   (res T))
 		  (dotimes (l l-peca)
 		  		(if (eq res nil)(return))
 		  		(dotimes (a a-peca)
-		  			;(format t "~%l-tab ~D: " (- alt-tab a 1))
-		  			;(format t "~%c-tab ~D: " (+ col l))
-		  			;(format t "~%->>>l-peca ~D: " l)
-		  			;(format t "~%->>>c-peca ~D: " (- a-peca a))
-		  			(if (and (eq (aref tab (- alt-tab a 1) (+ col l)) T)
-		  					 (eq (aref peca l (- a-peca a 1)) T))
+		  			(format t "~%l-tab ~D: " (- alt-tab a 1))
+		  			(format t "~%c-tab ~D: " (+ col l))
+		  			(format t "~%->>>l-peca ~D: " l)
+		  			(format t "~%->>>c-peca ~D: " (- a-peca a))
+		  			(if (and (eq (aref tab (- alt-tab a) (+ col l)) T)
+		  					 (eq (aref peca (- a-peca a 1) l ) T))
 		  				(progn
 		  					(setf res nil)
 		  					(return)))
