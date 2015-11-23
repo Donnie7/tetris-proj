@@ -1,6 +1,6 @@
 
 (load "proj.lisp")
-(load "utils.lisp")
+;(load "utils.lisp")
 
 ;;; definicao das configuracoes possiveis para cada peca
 ;;peca i 
@@ -67,7 +67,7 @@
 ;valida a altura de todas as colunas
 (setf t3-1 (= (tabuleiro-altura-coluna f 0) 0))
 (setf t3-2 (= (tabuleiro-altura-coluna f 1) 0))
-(setf t3-3 (= (tabuleiro-altura-coluna f 4) 16))
+(setf t3-3 (= (tabuleiro-altura-coluna f 4) 3))
 (setf t3-4 (= (tabuleiro-altura-coluna f 9) 0))
 
 ;TESTE 4
@@ -75,10 +75,10 @@
 ;tabuleiro de vazias para preenchidas
 (setf (aref f 0 0) T)
 (setf (aref f 9 9) T)
-(setf t4-1 (= (tabuleiro-altura-coluna f 0) 18))
-(setf t4-2 (= (tabuleiro-altura-coluna f 9) 9))
+(setf t4-1 (= (tabuleiro-altura-coluna f 0) 1))
+(setf t4-2 (= (tabuleiro-altura-coluna f 9) 10))
 (setf (aref f 17 9) T)
-(setf t4-3 (= (tabuleiro-altura-coluna f 9) 9))
+(setf t4-3 (= (tabuleiro-altura-coluna f 9) 18))
 
 ;TEST 5
 (setf f1 (cria-tabuleiro))
@@ -119,6 +119,13 @@
 (setf t5-3 (eq (tabuleiro-linha-completa-p f1 2) T))
 (setf t5-4 (eq (tabuleiro-linha-completa-p f1 3) nil))
 (setf t5-5 (eq (tabuleiro-linha-completa-p f1 17) nil))
+
+;TESTE 6
+;TESTES DO TABULEIRO-REMOVE-LINHA POR FAZER
+
+;TESTE 7
+;TESTES DO TABULEIRO-TOPO-PREENCHIDO-P POR FAZER
+
 
 ; lista de testes
 (setf test-list 
