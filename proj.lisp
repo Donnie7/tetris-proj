@@ -5,7 +5,7 @@
 
 
 (defstruct estado
-        pontos
+        (pontos 0)
         pecas-por-colocar
         pecas-colocadas
         tabuleiro)
@@ -34,7 +34,6 @@
 
 (defun accao-peca (accao)
 	(cdr accao))
-
 
 ;#######################################
 ;2.1.2 Tipo Tabuleiro
@@ -79,24 +78,17 @@
 		    ((< l 0)nil) 
 		    ((> l (- linhas 1))nil)
 		    ((setf (aref tab l c) T)T)))) 
-<<<<<<< HEAD
-		     
-=======
+
+(defun tabuleiro-copia-linha! (tab l-orig l-dest)
+	(dotimes (n (largura-matriz tab))
+		(setf (aref tab l-dest n)
+			  (aref tab l-orig n))))
 
 (defun tabuleiro-remove-linha! (tab l)
-	(let* ((linhas (array-dimension tab 0))
-	       (colunas (array-dimension tab 1))
-	       (linha-acima (+ l 1)))
-	      (loop
-		   (when (> linha-acima (- linhas 1)) (return))
-		   (dotimes (c colunas)
-	  		(setf (aref tab l c) (aref tab linha-acima c)))
-		   (incf l 1)
-		   (incf linha-acima 1))
-	      (dotimes (c colunas)
-		   (setf (aref tab (- linhas 1) c) nil))))
+	(dotimes (n (largura-matriz tab))
+		(setf (aref tab l n) nil)))
 
->>>>>>> origin/master
+
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
 	       (linhas (array-dimension tab 0))
@@ -104,14 +96,8 @@
             (dotimes (c colunas)
                 (cond ((eq (aref tab (- linhas 1) c) T)
                            (setf topo-preenchido T)(return))))
-<<<<<<< HEAD
           topo-preenchido))
 
-
-;(load "utils.fas")
-	
-=======
-          topo-preenchido))	      		     
 
 (defun tabuleiros-iguais-p (t1 t2)
 	(let* ((c (* (array-dimension t1 0)
@@ -229,28 +215,101 @@
 	(reverse res)))
 
 
-;;; espaco-vazio-peca-ultimas-linhas-p 
-
-(defun peca-encaixa-p (tab peca col)
-	(let* ((alt-tab (- (altura-matriz tab) 1))
+;;; peca-encaixa-p -> boolean
+;;; verifica se ha colisoes entre a peca e o tabuleiro na 
+;;; coluna col e 
+(defun peca-encaixa-p (tab peca desce-n-linhas col)
+	(let* ((alt-tab (- (altura-matriz tab) 1 desce-n-linhas))
 		   (l-peca (largura-matriz peca))
 		   (a-peca (altura-matriz peca))
 		   (res T))
 		  (dotimes (l l-peca)
-		  		(if (eq res nil)(return))
+		  		(if (eq res nil)
+		  			(return))
 		  		(dotimes (a a-peca)
-		  			(format t "~%l-tab ~D: " (- alt-tab a 1))
-		  			(format t "~%c-tab ~D: " (+ col l))
-		  			(format t "~%->>>l-peca ~D: " l)
-		  			(format t "~%->>>c-peca ~D: " (- a-peca a))
-		  			(if (and (eq (aref tab (- alt-tab a) (+ col l)) T)
-		  					 (eq (aref peca (- a-peca a 1) l ) T))
-		  				(progn
-		  					(setf res nil)
-		  					(return)))
+		  			(if (<= (+ (- alt-tab a) (- a-peca 1)) alt-tab)
+				  			(if (and (eq (aref tab (+ (- alt-tab a) (- a-peca 1)) 
+				  							       (+ col l)) T)
+				  					 (eq (aref peca (- a-peca a 1) l ) T))
+				  				(progn
+				  					(setf res nil)
+				  					(return))))
 		  		)
 		  )
 		  res))
+
+(defun tabuleiro-preenche-peca! (tab peca l c)
+	(let* ((alt-tab (altura-matriz tab))
+		   (alt-peca (altura-matriz peca))
+		   (larg-peca (largura-matriz peca)))
+		(dotimes (li alt-peca)
+		  	(dotimes (co larg-peca)
+		  		(if (and (eq (aref peca li co) 'T)
+		  				 (< (+ l li) alt-tab))
+			  		(setf (aref tab (+ l li) (+ c co))
+			  			  (aref peca li co)))
+		  		))))
+
+
+;;; esta funcao precisa de ser melhorada. pode ser feita 
+;;; de forma muito mais eficiente com recursao
+(defun tabuleiro-desce-e-desenha-peca! (tab peca c)
+	(let* ((ultima-linha-valida nil)
+		   (n-descidas-permitidas (- (altura-matriz tab)
+		   							 (altura-matriz peca)))
+		   (n 1))
+		(progn
+			(if (peca-encaixa-p tab peca 0 c)
+				(progn
+					(setf ultima-linha-valida (- (altura-matriz tab) 1)))
+				(return))
+			(loop
+				(when (or (eq ultima-linha-valida 0)
+						  (not (peca-encaixa-p tab peca n c)))
+					  	(tabuleiro-preenche-peca! tab peca ultima-linha-valida c)
+					  	(return))
+				(decf ultima-linha-valida 1)
+				(incf n 1)))))
+
+(defun rebenta-linhas-completas (tab)
+	(let* ((alt-tab (altura-matriz tab))
+		   (s 0)
+		   (linhas-rebentadas 0))
+		(dotimes (n alt-tab)
+			(if (tabuleiro-linha-completa-p tab n)
+				(progn
+					(tabuleiro-remove-linha! tab n)
+					(incf linhas-rebentadas 1))
+				(if (eq s n)
+					(incf s 1)		
+					(progn
+						(tabuleiro-copia-linha! tab n s)
+						(tabuleiro-remove-linha! tab n)
+						(incf s 1))
+					)
+				))
+		linhas-rebentadas))
+
+(defun calcula-pontos (pontos)
+	(cond ((eq pontos 0) 0)
+		   ((eq pontos 1) 100)
+		   ((eq pontos 2) 300)
+		   ((eq pontos 3) 500)
+		   ((eq pontos 4) 800)))
+
+(defun resultado (estado accao)
+	(let* ((novo-estado (copia-estado estado)))
+		(progn 
+			(tabuleiro-desce-e-desenha-peca! 
+				(estado-tabuleiro novo-estado)
+				(cdr accao)
+				(car accao))
+			(if (not (tabuleiro-topo-preenchido-p (estado-tabuleiro novo-estado)))
+				(setf (estado-pontos novo-estado) 
+						(+ (estado-pontos novo-estado) 
+							(calcula-pontos(rebenta-linhas-completas (estado-tabuleiro novo-estado)))))))
+		novo-estado))
+					
 
 
 (defun qualidade (e)
@@ -258,5 +317,4 @@
 
 
 
-;(load "utils.fas")?
->>>>>>> origin/master
+;(load "utils.fas")
