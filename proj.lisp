@@ -159,13 +159,14 @@
 		    (null (estado-pecas-por-colocar e))))
 
 (defun accoes-por-peca (p)
-	(case p ('i (list peca-i0 peca-i1))
-			('j (list peca-j0 peca-j1 peca-j2 peca-j3))
-			('l (list peca-l0 peca-l1 peca-l2 peca-l3))
-			('o (list peca-o0))
-			('s (list peca-s0 peca-s1))
-			('z (list peca-z0 peca-z1))
-			('t (list peca-t0 peca-t1 peca-t2 peca-t3))))
+	(case p (i (list peca-i0 peca-i1))
+			(j (list peca-j0 peca-j1 peca-j2 peca-j3))
+			(l (list peca-l0 peca-l1 peca-l2 peca-l3))
+			(o (list peca-o0))
+			(s (list peca-s0 peca-s1))
+			(z (list peca-z0 peca-z1))
+			('t (list peca-t0 peca-t1 peca-t2 peca-t3))
+			(otherwise nil)))
 
 ;;; deprecated
 (defun roda-peca (peca)
@@ -195,15 +196,17 @@
 	  (<= (+ (car accao) (- larg-peca 1)) c)))
 
 (defun accoes (e)
-	(let* ((res ())
+	(let* ((res nil)
 	       (lista-rotacoes (accoes-por-peca (car (estado-pecas-por-colocar e))))
 	       (larg-tab (array-dimension (estado-tabuleiro e) 1)))
-		(loop for r in lista-rotacoes do
-			(progn
-				(dotimes (c larg-tab)
-					(if (testa-limites-laterais (estado-tabuleiro e) 
-												(cria-accao c r))
-						(setf res (append res (list (cria-accao c r))))))))
+		(if (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
+			nil
+			(loop for r in lista-rotacoes do
+				(progn
+					(dotimes (c larg-tab)
+						(if (testa-limites-laterais (estado-tabuleiro e) 
+													(cria-accao c r))
+							(setf res (append res (list (cria-accao c r)))))))))
 		res))
 
 
@@ -240,14 +243,11 @@
 ;;; de forma muito mais eficiente com recursao
 (defun tabuleiro-desce-e-desenha-peca! (tab peca c)
 	(let* ((ultima-linha-valida nil)
-		   (n-descidas-permitidas (- (altura-matriz tab)
-		   							 (altura-matriz peca)))
 		   (n 1))
 		(progn
 			(if (peca-encaixa-p tab peca 0 c)
 				(progn
-					(setf ultima-linha-valida (- (altura-matriz tab) 1)))
-				(return))
+					(setf ultima-linha-valida (- (altura-matriz tab) 1))))
 			(loop
 				(when (or (eq ultima-linha-valida 0)
 						  (not (peca-encaixa-p tab peca n c)))
@@ -275,21 +275,24 @@
 				))
 		linhas-rebentadas))
 
-(defun calcula-pontos (pontos)
-	(case pontos	(0 0)
+(defun calcula-pontos (linhas-rebentadas)
+	(case linhas-rebentadas	(0 0)
 					(1 100)
 					(2 300)
 					(3 500)
-					(4 800)))
+					(4 800)
+					(otherwise nil)))
+
 
 (defun pontos-maximo-por-peca (peca)
-	(case peca 	('i 800)
-				('j 500)
-				('l 500)
-				('o 300)
-				('s 300)
-				('z 300)
-				('t 300)))
+	(case peca 	(i 800)
+				(j 500)
+				(l 500)
+				(o 300)
+				(s 300)
+				(z 300)
+				('t 300)
+				(otherwise nil)))
 
 
 (defun estado-actualiza-lista-pecas (estado)
@@ -322,4 +325,4 @@
 
 
 
-;(load "utils.fas")
+(load "utils.fas")
