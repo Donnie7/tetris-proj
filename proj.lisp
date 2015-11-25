@@ -311,7 +311,11 @@
 							(calcula-pontos(rebenta-linhas-completas (estado-tabuleiro novo-estado)))))))
 		novo-estado))
 					
-
+(defun custo-oportunidade (estado)
+	(let* ((custo-op 0))
+		(loop for i in (estado-pecas-colocadas estado) do
+			(setf custo-op (+ custo-op (pontos-maximo-por-peca i))))
+		(- custo-op (estado-pontos estado))))
 
 (defun qualidade (e)
 	(- (estado-pontos e)))
