@@ -158,18 +158,16 @@
 	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro e)))
 		    (null (estado-pecas-por-colocar e))))
 
-#|
-(defun roda-peca (peca)
-	(let* ((l (array-dimension peca 0))
-	       (c (array-dimension peca 1))
-	       (nova-peca (make-array (list c l) :initial-element 0)))
-	 (loop for coluna from 0 below c do
-		(loop for linha from 0 below l do
-		    (setf (aref nova-peca coluna linha)
-			  (aref peca (- (- l linha) 1) coluna))))
-	nova-peca))
-|#
+(defun accoes-por-peca (p)
+	(case p ('i (list peca-i0 peca-i1))
+			('j (list peca-j0 peca-j1 peca-j2 peca-j3))
+			('l (list peca-l0 peca-l1 peca-l2 peca-l3))
+			('o (list peca-o0))
+			('s (list peca-s0 peca-s1))
+			('z (list peca-z0 peca-z1))
+			('t (list peca-t0 peca-t1 peca-t2 peca-t3))))
 
+;;; deprecated
 (defun roda-peca (peca)
 	(cond ((equalp peca peca-i0) peca-i1)
 		  ((equalp peca peca-i1) peca-i0)
@@ -198,45 +196,32 @@
 
 (defun accoes (e)
 	(let* ((res ())
-	       (peca-inicial (car (estado-pecas-por-colocar e)))
-	       (peca-rodada nil)
-	       (res-peca-rodada peca-inicial)
-	       (larg-t (array-dimension (estado-tabuleiro e) 1))
-	       (c 0))
-	 (loop
-	     (when (tabuleiros-iguais-p peca-inicial peca-rodada) (return))
-             (dotimes (n larg-t)
-                 (when (not (testa-limites-laterais (estado-tabuleiro e) (cria-accao c res-peca-rodada))) (return))
-      		 (setf res (cons (cria-accao c res-peca-rodada) res))
-		 (setf c (+ n 1)))
-	     (setf c 0)
-	     (setf peca-rodada (roda-peca res-peca-rodada))
-	     (setf res-peca-rodada (roda-peca res-peca-rodada)))
-	(reverse res)))
+	       (lista-rotacoes (accoes-por-peca (car (estado-pecas-por-colocar e))))
+	       (larg-tab (array-dimension (estado-tabuleiro e) 1)))
+		(loop for r in lista-rotacoes do
+			(progn
+				(dotimes (c larg-tab)
+					(if (testa-limites-laterais (estado-tabuleiro e) 
+												(cria-accao c r))
+						(setf res (append res (list (cria-accao c r))))))))
+		res))
 
 
-;;; peca-encaixa-p -> boolean
-;;; verifica se ha colisoes entre a peca e o tabuleiro na 
-;;; coluna col e 
 (defun peca-encaixa-p (tab peca desce-n-linhas col)
-	(let* ((alt-tab (- (altura-matriz tab) 1 desce-n-linhas))
+	(let* ((alt-tab (- (altura-matriz tab) 1))
 		   (l-peca (largura-matriz peca))
 		   (a-peca (altura-matriz peca))
+		   (l-init (- alt-tab desce-n-linhas))
 		   (res T))
-		  (dotimes (l l-peca)
-		  		(if (eq res nil)
-		  			(return))
-		  		(dotimes (a a-peca)
-		  			(if (<= (+ (- alt-tab a) (- a-peca 1)) alt-tab)
-				  			(if (and (eq (aref tab (+ (- alt-tab a) (- a-peca 1)) 
-				  							       (+ col l)) T)
-				  					 (eq (aref peca (- a-peca a 1) l ) T))
-				  				(progn
-				  					(setf res nil)
-				  					(return))))
-		  		)
-		  )
-		  res))
+		(dotimes (c l-peca)
+			(dotimes (l a-peca)
+				(if (<= (+ l-init l) alt-tab)
+					(if (and (eq (aref tab (+ l-init l) (+ col c)) T)
+				  			 (eq (aref peca l c) T))
+						(progn
+							(setf res nil)
+							(return))))))
+		res))
 
 (defun tabuleiro-preenche-peca! (tab peca l c)
 	(let* ((alt-tab (altura-matriz tab))
@@ -297,9 +282,22 @@
 		   ((eq pontos 3) 500)
 		   ((eq pontos 4) 800)))
 
+(defun calcula-pontos-maximo (peca)
+	(let* ((alt-peca (altura-matriz peca))
+		  (larg-peca (largura-matriz peca))
+		  (comp-max (max alt-peca larg-peca)))
+		(* comp-max (calcula-pontos comp-max))))
+
+
+(defun estado-actualiza-lista-pecas (estado)
+	(setf (estado-pecas-colocadas estado) 
+		(cons (first (estado-pecas-por-colocar estado)) (estado-pecas-colocadas estado)))
+	(setf (estado-pecas-por-colocar estado) (cdr (estado-pecas-por-colocar estado))))
+
 (defun resultado (estado accao)
 	(let* ((novo-estado (copia-estado estado)))
 		(progn 
+			(estado-actualiza-lista-pecas novo-estado)
 			(tabuleiro-desce-e-desenha-peca! 
 				(estado-tabuleiro novo-estado)
 				(cdr accao)
