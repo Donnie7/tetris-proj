@@ -350,5 +350,11 @@
 				   				(setf res (append (list i) prox-res))
 				   				(return)))))))
 		res))
+#|
+(defun c-op-sort (a b)
+  (cond ((= (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)) 0)
+        (t (< (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)))))
+|#
+
 
 (load "utils.fas")
