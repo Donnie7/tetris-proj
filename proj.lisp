@@ -323,6 +323,32 @@
 (defun qualidade (e)
 	(- (estado-pontos e)))
 
-
+(defun procura-pp (problema)
+	(let* ((fronteira (reverse (accoes 
+							  		(problema-estado-inicial problema))))
+			(prox-estado nil)
+			(res nil)
+			(prox-res nil))
+		(loop for i in fronteira do 
+			(setf prox-estado (resultado (problema-estado-inicial problema) i))
+			(cond ((solucao prox-estado)
+					(progn
+						(setf res (list i))
+						(return)))
+				   ((tabuleiro-topo-preenchido-p (estado-tabuleiro prox-estado))
+				   	(continue))
+				   (t (progn
+				   		(setf prox-res (procura-pp (make-problema 
+				   										:estado-inicial prox-estado
+														:solucao (problema-solucao problema)
+														:accoes (problema-accoes problema)
+														:resultado (problema-resultado problema)
+														:custo-caminho (problema-custo-caminho problema))))
+				   		(if (null prox-res)
+				   			(continue)
+				   			(progn
+				   				(setf res (append (list i) prox-res))
+				   				(return)))))))
+		res))
 
 (load "utils.fas")
