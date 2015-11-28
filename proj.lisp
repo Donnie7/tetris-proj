@@ -56,7 +56,7 @@
 (defun tabuleiro-altura-coluna (tab c)
 	(let* ((linhas (array-dimension tab 0))
 	       (i linhas))
-	      (dotimes (l linhas)
+		  (dotimes (l linhas)
 	          (cond ((eq (aref tab (- (- linhas 1) l) c) T)
 			     (return)))
 	          (decf i 1))
@@ -84,11 +84,24 @@
 		(setf (aref tab l-dest n)
 			  (aref tab l-orig n))))
 
-(defun tabuleiro-remove-linha! (tab l)
+(defun limpa-linha! (tab l)
 	(dotimes (n (largura-matriz tab))
 		(setf (aref tab l n) nil)))
+		
 
-
+(defun tabuleiro-remove-linha! (tab l)
+	(let* ((alt-tab (altura-matriz tab))
+			(linha-del l)
+			(linha-seg (+ l 1)))
+			(loop 
+				(when (equal linha-seg (- alt-tab 1))
+					(return))
+				(tabuleiro-copia-linha! tab linha-seg linha-del)
+				(incf linha-del 1)
+				(incf linha-seg 1))
+		(limpa-linha! tab (- alt-tab 1))))
+				
+	  
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
 	       (linhas (array-dimension tab 0))
@@ -263,17 +276,18 @@
 		(dotimes (n alt-tab)
 			(if (tabuleiro-linha-completa-p tab n)
 				(progn
-					(tabuleiro-remove-linha! tab n)
+					(limpa-linha! tab n)
 					(incf linhas-rebentadas 1))
 				(if (eq s n)
 					(incf s 1)		
 					(progn
 						(tabuleiro-copia-linha! tab n s)
-						(tabuleiro-remove-linha! tab n)
+						(limpa-linha! tab n)
 						(incf s 1))
 					)
 				))
 		linhas-rebentadas))
+
 
 (defun calcula-pontos (linhas-rebentadas)
 	(case linhas-rebentadas	(0 0)
