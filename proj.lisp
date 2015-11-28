@@ -356,25 +356,65 @@
         (t (< (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)))))
 |#
 
-(defun procura-A* (problema heuristica)
-	(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
+(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
 		(cond ((= (third elem-fronteira-a) (third elem-fronteira-b)) 0)
 			   (t (< (third elem-fronteira-a) (third elem-fronteira-b)))))
-	(let* ((estado-inic (problema-estado-inicial problema))
-		  (fronteira (reverse (accoes estado-inic)))
-		  (fronteira-informada nil)
-		  (res nil))
+
+(defun procura-A* (problema heuristica)
+	(let* ((estado-actual (problema-estado-inicial problema))
+		   (fronteira (reverse (funcall (problema-accoes problema) estado-actual)))
+		   (fronteira-informada nil)
+	  	   (res nil))
 		(progn
-			 (loop for i in fronteira do
-			 	(setf fronteira-informada 
-			 		(append (list (list i 
-			 							estado-inic 
-			 							(funcall heuristica
-			 											(resultado estado-inic i))))
-			 				fronteira-informada)))
-			 (setf fronteira-informada (sort fronteira-informada #'sort-fronteira-informada)))
-	fronteira-informada))
+			(loop for i in fronteira do
+				;insere ordenadamente os 3-tuplo criados a partir na 
+				;fronteira ordenada, dentro da fronteira-informada
+				(progn
+					;;(print i)
+					;(print fronteira-informada)
+					(setf fronteira-informada (insert (list i estado-actual (funcall heuristica estado-actual))
+							fronteira-informada
+							#'sort-fronteira-informada)))))
+		fronteira-informada))
+
+
+#|
+(defun procura-A*-aux (problema heuristica fronteira-informada)
+		(let* ((estado-actual (problema-estado-inicial problema))
+			   (fronteira (reverse (accoes estado-actual)))
+			   (estado-seguinte nil)
+			   (fronteira-informada-actualizada nil)
+		  	   (res nil))
+			(progn
+				(loop for i in fronteira do
+					;insere ordenadamente os 3-tuplo criados a partir na 
+					;fronteira ordenada, dentro da fronteira-informada
+					(progn
+						;;(print i)
+						(setf estado-seguinte (resultado estado-actual i))
+						(print estado-seguinte)
+						(print fronteira-informada-actualizada1)
+						(insert (list i estado-seguinte (funcall heuristica estado-seguinte))
+								(list fronteira-informada-actualizada)
+								#'sort-fronteira-informada))))
+			fronteira-informada-actualizada))
+
+|#
+
+
+(defun insert (item lst &optional (key #'<))
+  (if (null lst)
+    (list item)
+    (if (funcall key item (car lst))
+          (cons item lst) 
+          (cons (car lst) (insert item (cdr lst) key)))))
+
+(defun insertion-sort (lst &optional (key #'<))
+  (if (null lst)
+    lst
+    (insert (car lst) (insertion-sort (cdr lst) key) key)))
 
 
 
 (load "utils.fas")
+
