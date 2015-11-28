@@ -101,24 +101,7 @@
 				(incf linha-seg 1))
 		(limpa-linha! tab (- alt-tab 1))))
 				
-	   ; (progn
-			; (dotimes (n alt-tab)
-				; (if (tabuleiro-linha-completa-p tab n)
-					; (progn
-						; (limpa-linha! tab n))
-						
-			; ()
-			; (if (eq s n)
-				; (incf s 1)		
-				; (progn
-					; (tabuleiro-copia-linha! tab n s)
-					; (limpa-linha! tab n)
-
-					; (incf s 1))
-				; )
-			; ))
-	; linhas-rebentadas))
-
+	  
 (defun tabuleiro-topo-preenchido-p (tab)
         (let* ((colunas (array-dimension tab 1))
 	       (linhas (array-dimension tab 0))
