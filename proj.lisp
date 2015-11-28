@@ -381,5 +381,31 @@
 				   				(setf res (append (list i) prox-res))
 				   				(return)))))))
 		res))
+#|
+(defun c-op-sort (a b)
+  (cond ((= (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)) 0)
+        (t (< (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)))))
+|#
+
+(defun procura-A* (problema heuristica)
+	(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
+		(cond ((= (third elem-fronteira-a) (third elem-fronteira-b)) 0)
+			   (t (< (third elem-fronteira-a) (third elem-fronteira-b)))))
+	(let* ((estado-inic (problema-estado-inicial problema))
+		  (fronteira (reverse (accoes estado-inic)))
+		  (fronteira-informada nil)
+		  (res nil))
+		(progn
+			 (loop for i in fronteira do
+			 	(setf fronteira-informada 
+			 		(append (list (list i 
+			 							estado-inic 
+			 							(funcall heuristica
+			 											(resultado estado-inic i))))
+			 				fronteira-informada)))
+			 (setf fronteira-informada (sort fronteira-informada #'sort-fronteira-informada)))
+	fronteira-informada))
+
+
 
 (load "utils.fas")
