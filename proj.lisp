@@ -338,13 +338,13 @@
 	(- (estado-pontos e)))
 
 (defun procura-pp (problema)
-	(let* ((fronteira (reverse (accoes 
+	(let* ((fronteira (reverse (funcall (problema-accoes problema) 
 							  		(problema-estado-inicial problema))))
 			(prox-estado nil)
 			(res nil)
 			(prox-res nil))
 		(loop for i in fronteira do 
-			(setf prox-estado (resultado (problema-estado-inicial problema) i))
+			(setf prox-estado (funcall (problema-resultado problema) (problema-estado-inicial problema) i))
 			(cond ((solucao prox-estado)
 					(progn
 						(setf res (list i))
