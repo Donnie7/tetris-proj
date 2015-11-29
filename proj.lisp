@@ -463,11 +463,17 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 400 fronteira-informada))
+	  										(cdr (first-n-elements 40 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
 
+	(defun custo-oportunidade2 (estado)
+	(let* ((custo-op 0))
+		(loop for i in (estado-pecas-colocadas estado) do
+			(setf custo-op (+ custo-op (pontos-maximo-por-peca i))))
+		(* 0.7(- custo-op (estado-pontos estado)))))
+	
 (defun procura-best (tab lista-pecas)
 	(let* ((estado (make-estado :tabuleiro tab 
 								:pecas-por-colocar lista-pecas))
@@ -476,7 +482,7 @@
 								:solucao #'solucao
 								:accoes #'accoes
 								:resultado #'resultado
-								:custo-caminho #'custo-oportunidade)))
+								:custo-caminho #'custo-oportunidade2)))
 		(procura-A*-best problema #'main-h)))
 
 
@@ -498,7 +504,7 @@
 		   (altura-media 0))
 		(dotimes (n (largura-matriz tab))
 			(setf altura-media (+ altura-media (tabuleiro-altura-coluna tab n))))
-		(* 100 (/ altura-media (largura-matriz tab)))))
+		(* 8000 (/ altura-media (largura-matriz tab)))))
 
 (defun h2-espacos-vazios (estado)
 	(let* ((tab (estado-tabuleiro estado))
@@ -510,7 +516,7 @@
 		 		(dotimes (n altura-max-temp)
 		 			(if (not (tabuleiro-preenchido-p tab n col))
 		 				(incf espacos-vazios 1)))))
-		(* 10 espacos-vazios)))
+		(* 70 espacos-vazios)))
 
 (defun main-h (estado)
 	(let ((total 0))
