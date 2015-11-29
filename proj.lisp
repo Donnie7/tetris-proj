@@ -17,6 +17,11 @@
         resultado
         custo-caminho)
 
+(defstruct heuristica-estrutura
+	peso
+	regulador
+	funcao)
+
 (defun largura-matriz (peca)
 	(array-dimension peca 1))
 
@@ -364,34 +369,35 @@
 				   				(setf res (append (list i) prox-res))
 				   				(return)))))))
 		res))
-#|
-(defun c-op-sort (a b)
-  (cond ((= (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)) 0)
-        (t (< (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)))))
-|#
 
+(defun insert (item lst &optional (key #'<))
+  (if (null lst)
+    (list item)
+    (if (funcall key item (car lst))
+          (cons item lst) 
+          (cons (car lst) (insert item (cdr lst) key)))))
+
+(defun insertion-sort (lst &optional (key #'<))
+  (if (null lst)
+    lst
+    (insert (car lst) (insertion-sort (cdr lst) key) key)))
+(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
+	(cond ((= (fourth elem-fronteira-a) (fourth elem-fronteira-b)) 0)
+		   (t (< (fourth elem-fronteira-a) (fourth elem-fronteira-b)))))
 
 (defun procura-A* (problema heuristica)
-	(defun insert (item lst &optional (key #'<))
-	  (if (null lst)
-	    (list item)
-	    (if (funcall key item (car lst))
-	          (cons item lst) 
-	          (cons (car lst) (insert item (cdr lst) key)))))
-
-	(defun insertion-sort (lst &optional (key #'<))
-	  (if (null lst)
-	    lst
-	    (insert (car lst) (insertion-sort (cdr lst) key) key)))
-	(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
-		(cond ((= (fourth elem-fronteira-a) (fourth elem-fronteira-b)) 0)
-			   (t (< (fourth elem-fronteira-a) (fourth elem-fronteira-b)))))
 	(defun procura-A*-aux (problema heuristica fronteira-informada caminho-ate-aqui)
 		(let* ((estado-actual (problema-estado-inicial problema))
 			   (estado-seguinte nil)
 			   (lista-accoes (funcall (problema-accoes problema) estado-actual)))
 			(progn
+				(if (and (null lista-accoes)
+						 (equal (length fronteira-informada) 1))
+					nil)
 				(loop for i in lista-accoes do
+					(if (and (null lista-accoes)
+						 (equal (length fronteira-informada) 1))
+					nil)
 					(progn
 						(setf estado-seguinte (funcall (problema-resultado problema)
 														estado-actual
@@ -399,23 +405,83 @@
 						(setf fronteira-informada (insert (list i 
 																estado-seguinte
 																(append caminho-ate-aqui (list i))
-																(funcall (problema-custo-caminho problema) estado-seguinte))
+																(+ (funcall (problema-custo-caminho problema) estado-seguinte)
+																	(funcall heuristica estado-seguinte)))
 								fronteira-informada
 								#'sort-fronteira-informada))))
+
 				(setf estado-seguinte (second (first fronteira-informada)))
-				(cond ((funcall (problema-solucao problema) estado-seguinte)
-						(third (first fronteira-informada)))
-					  (t (procura-A*-aux (make-problema 
-   											:estado-inicial estado-seguinte
-											:solucao (problema-solucao problema)
-											:accoes (problema-accoes problema)
-											:resultado (problema-resultado problema)
-											:custo-caminho (problema-custo-caminho problema))
-  										heuristica
-  										(cdr (first-n-elements 500 fronteira-informada))
-  										(third (first fronteira-informada))))))))
-					  		
+				(if (null estado-seguinte)
+					nil
+					(cond ((funcall (problema-solucao problema) estado-seguinte)
+							(third (first fronteira-informada)))
+						  (t (procura-A*-aux (make-problema 
+		   											:estado-inicial estado-seguinte
+													:solucao (problema-solucao problema)
+													:accoes (problema-accoes problema)
+													:resultado (problema-resultado problema)
+													:custo-caminho (problema-custo-caminho problema))
+	  										heuristica
+	  										(cdr fronteira-informada)
+	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux problema heuristica nil nil))
+
+(defun procura-A*-best (problema heuristica)
+	(defun procura-A*-aux-best (problema heuristica fronteira-informada caminho-ate-aqui)
+		(let* ((estado-actual (problema-estado-inicial problema))
+			   (estado-seguinte nil)
+			   (lista-accoes (funcall (problema-accoes problema) estado-actual)))
+			(progn
+				(if (and (null lista-accoes)
+						 (equal (length fronteira-informada) 1))
+					nil)
+				(loop for i in lista-accoes do
+					(if (and (null lista-accoes)
+						 (equal (length fronteira-informada) 1))
+					nil)
+					(progn
+						(setf estado-seguinte (funcall (problema-resultado problema)
+														estado-actual
+														i))
+						(setf fronteira-informada (insert (list i 
+																estado-seguinte
+																(append caminho-ate-aqui (list i))
+																(+ (funcall (problema-custo-caminho problema) estado-seguinte)
+																	(funcall heuristica estado-seguinte)))
+								fronteira-informada
+								#'sort-fronteira-informada))))
+
+				(setf estado-seguinte (second (first fronteira-informada)))
+				(if (null estado-seguinte)
+					nil
+					(cond ((funcall (problema-solucao problema) estado-seguinte)
+							(third (first fronteira-informada)))
+						  (t (procura-A*-aux-best (make-problema 
+		   											:estado-inicial estado-seguinte
+													:solucao (problema-solucao problema)
+													:accoes (problema-accoes problema)
+													:resultado (problema-resultado problema)
+													:custo-caminho (problema-custo-caminho problema))
+	  										heuristica
+	  										(cdr (first-n-elements 400 fronteira-informada))
+	  										(third (first fronteira-informada)))))))))
+	(procura-A*-aux-best problema heuristica nil nil))
+
+
+(defun procura-best (tab lista-pecas)
+	(let* ((estado (make-estado :tabuleiro tab 
+								:pecas-por-colocar lista-pecas))
+		   (problema (make-problema 
+								:estado-inicial estado
+								:solucao #'solucao
+								:accoes #'accoes
+								:resultado #'resultado
+								:custo-caminho #'custo-oportunidade)))
+		(procura-A*-best problema #'main-h)))
+
+
+			
+
 
 (defun first-n-elements (a b)
 	(let* ((max-len (length b)))
@@ -423,6 +489,35 @@
 			for y = (car b) do
 				(setq b (cdr b))
 				collect y)))
+;#######################################
+;2.2.3 heuristicas
+;#######################################
+
+(defun h1-menor-altura (estado)
+	(let* ((tab (estado-tabuleiro estado))
+		   (altura-media 0))
+		(dotimes (n (largura-matriz tab))
+			(setf altura-media (+ altura-media (tabuleiro-altura-coluna tab n))))
+		(* 100 (/ altura-media (largura-matriz tab)))))
+
+(defun h2-espacos-vazios (estado)
+	(let* ((tab (estado-tabuleiro estado))
+	       (espacos-vazios 0)
+	       (altura-max-temp 0))
+		(dotimes (col (largura-matriz tab))
+		 	(progn
+		 		(setf altura-max-temp (tabuleiro-altura-coluna tab col))
+		 		(dotimes (n altura-max-temp)
+		 			(if (not (tabuleiro-preenchido-p tab n col))
+		 				(incf espacos-vazios 1)))))
+		(* 10 espacos-vazios)))
+
+(defun main-h (estado)
+	(let ((total 0))
+		(setf total (+ (h1-menor-altura estado)
+						(h2-espacos-vazios estado)))
+		total))
+
 
 
 
