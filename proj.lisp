@@ -345,12 +345,12 @@
 			(prox-res nil))
 		(loop for i in fronteira do 
 			(setf prox-estado (funcall (problema-resultado problema) (problema-estado-inicial problema) i))
-			(cond ((solucao prox-estado)
+			(cond ((funcall (problema-solucao problema) prox-estado)
 					(progn
 						(setf res (list i))
 						(return)))
-				   ((tabuleiro-topo-preenchido-p (estado-tabuleiro prox-estado))
-				   	(continue))
+				   ;((tabuleiro-topo-preenchido-p (estado-tabuleiro prox-estado))
+				   ;	(continue))
 				   (t (progn
 				   		(setf prox-res (procura-pp (make-problema 
 				   										:estado-inicial prox-estado
@@ -370,63 +370,60 @@
         (t (< (pontos-maximo-por-peca a) (pontos-maximo-por-peca b)))))
 |#
 
-(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
-		(cond ((= (third elem-fronteira-a) (third elem-fronteira-b)) 0)
-			   (t (< (third elem-fronteira-a) (third elem-fronteira-b)))))
 
 (defun procura-A* (problema heuristica)
-	(let* ((estado-actual (problema-estado-inicial problema))
-		   (fronteira (reverse (funcall (problema-accoes problema) estado-actual)))
-		   (fronteira-informada nil)
-	  	   (res nil))
-		(progn
-			(loop for i in fronteira do
-				;insere ordenadamente os 3-tuplo criados a partir na 
-				;fronteira ordenada, dentro da fronteira-informada
-				(progn
-					;;(print i)
-					;(print fronteira-informada)
-					(setf fronteira-informada (insert (list i estado-actual (funcall heuristica estado-actual))
-							fronteira-informada
-							#'sort-fronteira-informada)))))
-		fronteira-informada))
+	(defun insert (item lst &optional (key #'<))
+	  (if (null lst)
+	    (list item)
+	    (if (funcall key item (car lst))
+	          (cons item lst) 
+	          (cons (car lst) (insert item (cdr lst) key)))))
 
-
-#|
-(defun procura-A*-aux (problema heuristica fronteira-informada)
+	(defun insertion-sort (lst &optional (key #'<))
+	  (if (null lst)
+	    lst
+	    (insert (car lst) (insertion-sort (cdr lst) key) key)))
+	(defun sort-fronteira-informada (elem-fronteira-a elem-fronteira-b)
+		(cond ((= (fourth elem-fronteira-a) (fourth elem-fronteira-b)) 0)
+			   (t (< (fourth elem-fronteira-a) (fourth elem-fronteira-b)))))
+	(defun procura-A*-aux (problema heuristica fronteira-informada caminho-ate-aqui)
 		(let* ((estado-actual (problema-estado-inicial problema))
-			   (fronteira (reverse (accoes estado-actual)))
 			   (estado-seguinte nil)
-			   (fronteira-informada-actualizada nil)
-		  	   (res nil))
+			   (lista-accoes (funcall (problema-accoes problema) estado-actual)))
 			(progn
-				(loop for i in fronteira do
-					;insere ordenadamente os 3-tuplo criados a partir na 
-					;fronteira ordenada, dentro da fronteira-informada
+				(loop for i in lista-accoes do
 					(progn
-						;;(print i)
-						(setf estado-seguinte (resultado estado-actual i))
-						(print estado-seguinte)
-						(print fronteira-informada-actualizada1)
-						(insert (list i estado-seguinte (funcall heuristica estado-seguinte))
-								(list fronteira-informada-actualizada)
+						(setf estado-seguinte (funcall (problema-resultado problema)
+														estado-actual
+														i))
+						(setf fronteira-informada (insert (list i 
+																estado-seguinte
+																(append caminho-ate-aqui (list i))
+																(funcall (problema-custo-caminho problema) estado-seguinte))
+								fronteira-informada
 								#'sort-fronteira-informada))))
-			fronteira-informada-actualizada))
+				(setf estado-seguinte (second (first fronteira-informada)))
+				(cond ((funcall (problema-solucao problema) estado-seguinte)
+						(third (first fronteira-informada)))
+					  (t (procura-A*-aux (make-problema 
+   											:estado-inicial estado-seguinte
+											:solucao (problema-solucao problema)
+											:accoes (problema-accoes problema)
+											:resultado (problema-resultado problema)
+											:custo-caminho (problema-custo-caminho problema))
+  										heuristica
+  										(cdr (first-n-elements 500 fronteira-informada))
+  										(third (first fronteira-informada))))))))
+					  		
+	(procura-A*-aux problema heuristica nil nil))
 
-|#
+(defun first-n-elements (a b)
+	(let* ((max-len (length b)))
+		(loop for x from 1 to (min a max-len)
+			for y = (car b) do
+				(setq b (cdr b))
+				collect y)))
 
-
-(defun insert (item lst &optional (key #'<))
-  (if (null lst)
-    (list item)
-    (if (funcall key item (car lst))
-          (cons item lst) 
-          (cons (car lst) (insert item (cdr lst) key)))))
-
-(defun insertion-sort (lst &optional (key #'<))
-  (if (null lst)
-    lst
-    (insert (car lst) (insertion-sort (cdr lst) key) key)))
 
 
 
