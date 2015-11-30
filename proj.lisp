@@ -487,7 +487,7 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 30 fronteira-informada))
+	  										(cdr (first-n-elements 50 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
@@ -523,14 +523,14 @@
 ;2.2.3 heuristicas
 ;#######################################
 
-(defun h1-menor-altura (estado)
+(defun h1-menor-altura (estado peso)
 	(let* ((tab (estado-tabuleiro estado))
 		   (altura-media 0))
 		(dotimes (n (largura-matriz tab))
 			(setf altura-media (+ altura-media (tabuleiro-altura-coluna tab n))))
-		(* 20 (/ altura-media (largura-matriz tab)))))
+		(* peso (/ altura-media (largura-matriz tab)))))
 
-(defun h2-espacos-vazios (estado)
+(defun h2-espacos-vazios (estado peso)
 	(let* ((tab (estado-tabuleiro estado))
 	       (espacos-vazios 0)
 	       (altura-max-temp 0))
@@ -540,21 +540,60 @@
 		 		(dotimes (n altura-max-temp)
 		 			(if (not (tabuleiro-preenchido-p tab n col))
 		 				(incf espacos-vazios 1)))))
-		(* 100 espacos-vazios)))
-(defun h3-bumps (estado)
+		(* peso espacos-vazios)))
+(defun h3-bumps (estado peso)
 	(let* ((tab (estado-tabuleiro estado))
 		   (bumps 0))
 		(dotimes (n (- (largura-matriz tab) 1))
 			(setf bumps (+ bumps (abs (- (tabuleiro-altura-coluna tab n)
 									(tabuleiro-altura-coluna tab (+ n 1)))))))
-		(* 10 bumps)))
+		(* peso bumps)))
 
+(defun h3-bumps-with-one-hole (estado peso-total peso-hole)
+	(let* ((tab (estado-tabuleiro estado))
+		   (hole nil)
+		   (tmp nil)
+		   (bumps 0)
+		   (others nil))
+	(progn 
+		(setf hole (tabuleiro-altura-coluna tab 0))
+		(dotimes (n 9)
+			(progn
+				(setf tmp (tabuleiro-altura-coluna tab (+ n 1)))
+				(if (> hole tmp)
+					(progn
+						(setf others (append (list hole) others))
+						(setf hole tmp))
+					(setf others (append (list tmp) others )))))
+		(loop for i in others do
+			(setf bumps (+ bumps i))))
+	(* peso-total (+ (/ bumps 9) (* peso-hole hole)))))
+
+
+(defun h4-bumps-improved (estado peso-bumps peso-bumps-hole-a peso-bumps-hole-b)
+	;if estado-pecas-por-colocar ainda contem i
+	(if (not (null (find 'i (estado-pecas-por-colocar estado))))
+		(h3-bumps-with-one-hole estado peso-bumps-hole-a peso-bumps-hole-b)
+		(h3-bumps estado peso-bumps)))
+
+		
+		;(h3-bumps-with-one-hole estado)
+		;(h3-bumps estado)))
+	 
 
 (defun main-h (estado)
-	(let ((total 0))
-		(setf total (+ (h1-menor-altura estado)
-						(h2-espacos-vazios estado)
-						(h3-bumps estado)))
+	(let* ((total 0)
+		  (len-lista-pecas (length (estado-pecas-por-colocar estado)))
+		 (peso-h1 (if (< len-lista-pecas 10) 
+		 				100 ;lista pecas a terminar
+		 				50)) ;lista de pecas grande
+		 (peso-h2 500)       ;buracos
+		 (peso-h3-a 50)      ;bumps normal
+		 (peso-h3-b 200)     ;bumps-hole total
+		 (peso-h3-c 20))     ;altura hole
+		(setf total (+ (h1-menor-altura estado peso-h1)
+						(h2-espacos-vazios estado peso-h2)
+						(h4-bumps-improved estado peso-h3-a peso-h3-b peso-h3-c)))
 		total))
 
 
