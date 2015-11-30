@@ -61,9 +61,9 @@
 
 
 
-(defvar ge4 (make-estado :tabuleiro gt4 :pecas-por-colocar '(i z s t l o i z s z o o i t t z l z s t l o i z s z o o)))
+(defvar ge4 (make-estado :tabuleiro gt4 :pecas-por-colocar '(i z s t l o i z s z o o i t t z l z s t l o i z s z o o z s j j z l s o o i j z)))
 (defvar gp4
-	(make-problema :estado-inicial (make-estado :tabuleiro gt4 :pecas-por-colocar '(i z s t l o i z s z o o i t t z l z s t l o i z s z o o))			
+	(make-problema :estado-inicial (make-estado :tabuleiro gt4 :pecas-por-colocar '(i z s t l o i z s z o o i t t z l z s t l o i z s z o o z s j j z l s o o i j z))			
 				   :solucao #'solucao
 				   :accoes #'accoes
 				   :resultado #'resultado

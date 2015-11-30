@@ -1,3 +1,8 @@
+; Gabriel Calmeiro 57774		
+; Ricardo Afonso 71070 		
+; Marco Tomas 65921		
+; Grupo TG 14
+
 (defstruct estado
         (pontos 0)
         pecas-por-colocar
@@ -487,7 +492,7 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 50 fronteira-informada))
+	  										(cdr (first-n-elements 30 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
@@ -571,14 +576,9 @@
 
 
 (defun h4-bumps-improved (estado peso-bumps peso-bumps-hole-a peso-bumps-hole-b)
-	;if estado-pecas-por-colocar ainda contem i
 	(if (not (null (find 'i (estado-pecas-por-colocar estado))))
 		(h3-bumps-with-one-hole estado peso-bumps-hole-a peso-bumps-hole-b)
 		(h3-bumps estado peso-bumps)))
-
-		
-		;(h3-bumps-with-one-hole estado)
-		;(h3-bumps estado)))
 	 
 
 (defun main-h (estado)
@@ -589,15 +589,11 @@
 		 				50)) ;lista de pecas grande
 		 (peso-h2 500)       ;buracos
 		 (peso-h3-a 50)      ;bumps normal
-		 (peso-h3-b 200)     ;bumps-hole total
-		 (peso-h3-c 20))     ;altura hole
+		 (peso-h3-b 170)     ;bumps-hole total
+		 (peso-h3-c 17))     ;altura hole
 		(setf total (+ (h1-menor-altura estado peso-h1)
 						(h2-espacos-vazios estado peso-h2)
 						(h4-bumps-improved estado peso-h3-a peso-h3-b peso-h3-c)))
 		total))
-
-
-
-
 
 (load "utils.fas")
