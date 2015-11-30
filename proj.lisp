@@ -71,7 +71,7 @@
 
 (defun tabuleiro-preenche! (tab l c)
 	(let* ((linhas (array-dimension tab 0))
-	       (colunas (array-dimension tab 1)))
+	       (colunas (array-dimension tab 1))) 
 	      (cond ((< c 0)nil)
 		    ((> c (- colunas 1))nil)
 		    ((< l 0)nil) 
@@ -79,26 +79,27 @@
 		    ((setf (aref tab l c) T)T)))) 
 
 (defun tabuleiro-copia-linha! (tab l-orig l-dest)
-	(dotimes (n (largura-matriz tab))
-		(setf (aref tab l-dest n)
-			  (aref tab l-orig n))))
-
+	(progn
+		(limpa-linha! tab l-dest)
+		(dotimes (n 10)
+			(if (tabuleiro-preenchido-p tab l-orig n)
+				(tabuleiro-preenche! tab l-dest n)))))
+				
 (defun limpa-linha! (tab l)
-	(dotimes (n (largura-matriz tab))
+	(dotimes (n 10)
 		(setf (aref tab l n) nil)))
 		
 
 (defun tabuleiro-remove-linha! (tab l)
-	(let* ((alt-tab (altura-matriz tab))
+	(let* ((alt-tab 18)
 			(linha-del l)
 			(linha-seg (+ l 1)))
 			(loop 
-				(when (equal linha-seg (- alt-tab 1))
+				(when (> linha-seg (- alt-tab 1))
 					(return))
 				(tabuleiro-copia-linha! tab linha-seg linha-del)
 				(incf linha-del 1)
-				(incf linha-seg 1))
-		(limpa-linha! tab (- alt-tab 1))))
+				(incf linha-seg 1))))
 				
 	  
 (defun tabuleiro-topo-preenchido-p (tab)
@@ -202,28 +203,27 @@
 		  ((equalp peca peca-t2) peca-t3)
 		  ((equalp peca peca-t3) peca-t0)))
 
-(defun testa-limites-laterais (tab accao)
-	(let* ((c (-(array-dimension tab 1) 1))
+(defun testa-limites-laterais (accao)
+	(let* ((c 9)
 	       (larg-peca (largura-matriz (cdr accao))))
 	  (<= (+ (car accao) (- larg-peca 1)) c)))
 
 (defun accoes (e)
 	(let* ((res nil)
 	       (lista-rotacoes (accoes-por-peca (car (estado-pecas-por-colocar e))))
-	       (larg-tab (array-dimension (estado-tabuleiro e) 1)))
+	       (larg-tab 10))
 		(if (tabuleiro-topo-preenchido-p (estado-tabuleiro e))
 			nil
 			(loop for r in lista-rotacoes do
 				(progn
 					(dotimes (c larg-tab)
-						(if (testa-limites-laterais (estado-tabuleiro e) 
-													(cria-accao c r))
+						(if (testa-limites-laterais (cria-accao c r))
 							(setf res (append res (list (cria-accao c r)))))))))
 		res))
 
 
 (defun peca-encaixa-p (tab peca desce-n-linhas col)
-	(let* ((alt-tab (- (altura-matriz tab) 1))
+	(let* ((alt-tab 17)
 		   (l-peca (largura-matriz peca))
 		   (a-peca (altura-matriz peca))
 		   (l-init (- alt-tab desce-n-linhas))
@@ -231,7 +231,7 @@
 		(dotimes (c l-peca)
 			(dotimes (l a-peca)
 				(if (<= (+ l-init l) alt-tab)
-					(if (and (eq (aref tab (+ l-init l) (+ col c)) T)
+					(if (and (tabuleiro-preenchido-p tab (+ l-init l) (+ col c))
 				  			 (eq (aref peca l c) T))
 						(progn
 							(setf res nil)
@@ -239,16 +239,14 @@
 		res))
 
 (defun tabuleiro-preenche-peca! (tab peca l c)
-	(let* ((alt-tab (altura-matriz tab))
+	(let* ((alt-tab 18)
 		   (alt-peca (altura-matriz peca))
 		   (larg-peca (largura-matriz peca)))
 		(dotimes (li alt-peca)
 		  	(dotimes (co larg-peca)
 		  		(if (and (eq (aref peca li co) 'T)
 		  				 (< (+ l li) alt-tab))
-			  		(setf (aref tab (+ l li) (+ c co))
-			  			  (aref peca li co)))
-		  		))))
+		  			(tabuleiro-preenche! tab (+ l li) (+ c co)))))))
 
 
 ;;; esta funcao precisa de ser melhorada. pode ser feita 
@@ -259,7 +257,7 @@
 		(progn
 			(if (peca-encaixa-p tab peca 0 c)
 				(progn
-					(setf ultima-linha-valida (- (altura-matriz tab) 1))))
+					(setf ultima-linha-valida 17)))
 			(loop
 				(when (or (eq ultima-linha-valida 0)
 						  (not (peca-encaixa-p tab peca n c)))
@@ -267,9 +265,9 @@
 					  	(return))
 				(decf ultima-linha-valida 1)
 				(incf n 1)))))
-
+#|
 (defun rebenta-linhas-completas (tab)
-	(let* ((alt-tab (altura-matriz tab))
+	(let* ((alt-tab 18)
 		   (s 0)
 		   (linhas-rebentadas 0))
 		(dotimes (n alt-tab)
@@ -285,6 +283,23 @@
 						(incf s 1))
 					)
 				))
+		linhas-rebentadas))
+|#
+
+(defun rebenta-linhas-completas (tab)
+	(let* ((linhas-rebentadas 0)
+		  (n 0))
+		(loop 
+			(when (> n 16) (return))
+			(if (tabuleiro-linha-completa-p tab n)
+				(progn
+					(tabuleiro-remove-linha! tab n)
+					(if (not (tabuleiro-linha-completa-p tab n))
+						(progn
+							(incf n 1)
+							(incf linhas-rebentadas 1))
+						(incf linhas-rebentadas 1)))
+				(incf n 1)))
 		linhas-rebentadas))
 
 
