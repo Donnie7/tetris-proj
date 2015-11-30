@@ -463,7 +463,7 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 40 fronteira-informada))
+	  										(cdr (first-n-elements 200 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
@@ -516,12 +516,21 @@
 		 		(dotimes (n altura-max-temp)
 		 			(if (not (tabuleiro-preenchido-p tab n col))
 		 				(incf espacos-vazios 1)))))
-		(* 70 espacos-vazios)))
+		(* 100 espacos-vazios)))
+(defun h3-bumps (estado)
+	(let* ((tab (estado-tabuleiro estado))
+		   (bumps 0))
+		(dotimes (n (- (largura-matriz tab) 1))
+			(setf bumps (+ bumps (abs (- (tabuleiro-altura-coluna tab n)
+									(tabuleiro-altura-coluna tab (+ n 1)))))))
+		(* 50 bumps)))
+
 
 (defun main-h (estado)
 	(let ((total 0))
 		(setf total (+ (h1-menor-altura estado)
-						(h2-espacos-vazios estado)))
+						(h2-espacos-vazios estado)
+						(h3-bumps estado)))
 		total))
 
 
