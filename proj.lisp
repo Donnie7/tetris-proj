@@ -265,8 +265,8 @@
 					  	(return))
 				(decf ultima-linha-valida 1)
 				(incf n 1)))))
-#|
-(defun rebenta-linhas-completas (tab)
+
+(defun rebenta-linhas-completas-melhorado (tab)
 	(let* ((alt-tab 18)
 		   (s 0)
 		   (linhas-rebentadas 0))
@@ -284,7 +284,7 @@
 					)
 				))
 		linhas-rebentadas))
-|#
+
 
 (defun rebenta-linhas-completas (tab)
 	(let* ((linhas-rebentadas 0)
@@ -341,7 +341,22 @@
 						(+ (estado-pontos novo-estado) 
 							(calcula-pontos(rebenta-linhas-completas (estado-tabuleiro novo-estado)))))))
 		novo-estado))
+
+(defun resultado-melhorado (estado accao)
+	(let* ((novo-estado (copia-estado estado)))
+		(progn 
+			(estado-actualiza-lista-pecas novo-estado)
+			(tabuleiro-desce-e-desenha-peca! 
+				(estado-tabuleiro novo-estado)
+				(cdr accao)
+				(car accao))
+			(if (not (tabuleiro-topo-preenchido-p (estado-tabuleiro novo-estado)))
+				(setf (estado-pontos novo-estado) 
+						(+ (estado-pontos novo-estado) 
+							(calcula-pontos(rebenta-linhas-completas-melhorado (estado-tabuleiro novo-estado)))))))
+		novo-estado))
 					
+
 (defun custo-oportunidade (estado)
 	(let* ((custo-op 0))
 		(loop for i in (estado-pecas-colocadas estado) do
@@ -472,7 +487,7 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 80 fronteira-informada))
+	  										(cdr (first-n-elements 30 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
@@ -490,7 +505,7 @@
 								:estado-inicial estado
 								:solucao #'solucao
 								:accoes #'accoes
-								:resultado #'resultado
+								:resultado #'resultado-melhorado
 								:custo-caminho #'custo-oportunidade2)))
 		(procura-A*-best problema #'main-h)))
 
@@ -513,7 +528,7 @@
 		   (altura-media 0))
 		(dotimes (n (largura-matriz tab))
 			(setf altura-media (+ altura-media (tabuleiro-altura-coluna tab n))))
-		(* 10 (/ altura-media (largura-matriz tab)))))
+		(* 20 (/ altura-media (largura-matriz tab)))))
 
 (defun h2-espacos-vazios (estado)
 	(let* ((tab (estado-tabuleiro estado))
