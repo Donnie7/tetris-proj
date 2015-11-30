@@ -1,9 +1,3 @@
-; Gabriel Calmeiro 57774
-; Ricardo Afonso 71070 
-; Marco Tomas 65921
-; Grupo TG 14
-
-
 (defstruct estado
         (pontos 0)
         pecas-por-colocar
@@ -68,15 +62,12 @@
 	  i))
 
 (defun tabuleiro-linha-completa-p (tab l)
-	(let* ((colunas (largura-matriz tab))
-		(res T))
+	(let* ((colunas (array-dimension tab 1))
+	       (linha-total T))
 	    (dotimes (c colunas)
-		 	(if (not (tabuleiro-preenchido-p tab l c))
-		 		(progn
-		 			(setf res nil)
-		 			(return))))
-	    res))
-
+		(cond ((eq (aref tab l c) nil) 
+			   (setf linha-total nil)(return))))
+	  linha-total))
 
 (defun tabuleiro-preenche! (tab l c)
 	(let* ((linhas (array-dimension tab 0))
@@ -87,19 +78,17 @@
 		    ((> l (- linhas 1))nil)
 		    ((setf (aref tab l c) T)T)))) 
 
+(defun tabuleiro-copia-linha! (tab l-orig l-dest)
+	(dotimes (n (largura-matriz tab))
+		(setf (aref tab l-dest n)
+			  (aref tab l-orig n))))
 
-
-
+(defun limpa-linha! (tab l)
+	(dotimes (n (largura-matriz tab))
+		(setf (aref tab l n) nil)))
 		
 
 (defun tabuleiro-remove-linha! (tab l)
-	(defun limpa-linha! (tab l)
-		(dotimes (n (largura-matriz tab))
-		(setf (aref tab l n) nil)))
-	(defun tabuleiro-copia-linha! (tab l-orig l-dest)
-		(dotimes (n (largura-matriz tab))
-			(setf (aref tab l-dest n)
-				  (aref tab l-orig n))))
 	(let* ((alt-tab (altura-matriz tab))
 			(linha-del l)
 			(linha-seg (+ l 1)))
@@ -191,6 +180,28 @@
 			('t (list peca-t0 peca-t1 peca-t2 peca-t3))
 			(otherwise nil)))
 
+;;; deprecated
+(defun roda-peca (peca)
+	(cond ((equalp peca peca-i0) peca-i1)
+		  ((equalp peca peca-i1) peca-i0)
+		  ((equalp peca peca-l0) peca-l1)
+		  ((equalp peca peca-l1) peca-l2)
+		  ((equalp peca peca-l2) peca-l3)
+		  ((equalp peca peca-l3) peca-l0)
+		  ((equalp peca peca-j0) peca-j1)
+		  ((equalp peca peca-j1) peca-j2)
+		  ((equalp peca peca-j2) peca-j3)
+		  ((equalp peca peca-j3) peca-j0)
+		  ((equalp peca peca-o0) peca-o0)
+		  ((equalp peca peca-s0) peca-s1)
+		  ((equalp peca peca-s1) peca-s0)
+		  ((equalp peca peca-z0) peca-z1)
+		  ((equalp peca peca-z1) peca-z0)
+		  ((equalp peca peca-t0) peca-t1)
+		  ((equalp peca peca-t1) peca-t2)
+		  ((equalp peca peca-t2) peca-t3)
+		  ((equalp peca peca-t3) peca-t0)))
+
 (defun testa-limites-laterais (tab accao)
 	(let* ((c (-(array-dimension tab 1) 1))
 	       (larg-peca (largura-matriz (cdr accao))))
@@ -257,8 +268,33 @@
 				(decf ultima-linha-valida 1)
 				(incf n 1)))))
 
+(defun rebenta-linhas-completas (tab)
+	(let* ((alt-tab (altura-matriz tab))
+		   (s 0)
+		   (linhas-rebentadas 0))
+		(dotimes (n alt-tab)
+			(if (tabuleiro-linha-completa-p tab n)
+				(progn
+					(limpa-linha! tab n)
+					(incf linhas-rebentadas 1))
+				(if (eq s n)
+					(incf s 1)		
+					(progn
+						(tabuleiro-copia-linha! tab n s)
+						(limpa-linha! tab n)
+						(incf s 1))
+					)
+				))
+		linhas-rebentadas))
 
 
+(defun calcula-pontos (linhas-rebentadas)
+	(case linhas-rebentadas	(0 0)
+					(1 100)
+					(2 300)
+					(3 500)
+					(4 800)
+					(otherwise nil)))
 
 
 (defun pontos-maximo-por-peca (peca)
@@ -272,45 +308,12 @@
 				(otherwise nil)))
 
 
-
+(defun estado-actualiza-lista-pecas (estado)
+	(setf (estado-pecas-colocadas estado) 
+		(cons (first (estado-pecas-por-colocar estado)) (estado-pecas-colocadas estado)))
+	(setf (estado-pecas-por-colocar estado) (cdr (estado-pecas-por-colocar estado))))
 
 (defun resultado (estado accao)
-	(defun limpa-linha!-aux (tab l)
-		(dotimes (n (largura-matriz tab))
-			(setf (aref tab l n) nil)))
-	(defun calcula-pontos (linhas-rebentadas)
-		(case linhas-rebentadas	(0 0)
-						(1 100)
-						(2 300)
-						(3 500)
-						(4 800)
-						(otherwise nil)))
-	(defun estado-actualiza-lista-pecas (estado)
-		(setf (estado-pecas-colocadas estado) 
-			(cons (first (estado-pecas-por-colocar estado)) (estado-pecas-colocadas estado)))
-		(setf (estado-pecas-por-colocar estado) (cdr (estado-pecas-por-colocar estado))))
-	(defun rebenta-linhas-completas (tab)
-		(defun tabuleiro-copia-linha!-aux (tab l-orig l-dest)
-			(dotimes (n (largura-matriz tab))
-				(setf (aref tab l-dest n)
-					  (aref tab l-orig n))))
-		(let* ((alt-tab (altura-matriz tab))
-			   (s 0)
-			   (linhas-rebentadas 0))
-			(dotimes (n alt-tab)
-				(if (tabuleiro-linha-completa-p tab n)
-					(progn
-						(limpa-linha!-aux tab n)
-						(incf linhas-rebentadas 1))
-					(if (eq s n)
-						(incf s 1)		
-						(progn
-							(tabuleiro-copia-linha!-aux tab n s)
-							(limpa-linha!-aux tab n)
-							(incf s 1))
-						)
-					))
-			linhas-rebentadas))
 	(let* ((novo-estado (copia-estado estado)))
 		(progn 
 			(estado-actualiza-lista-pecas novo-estado)
@@ -345,6 +348,8 @@
 					(progn
 						(setf res (list i))
 						(return)))
+				   ;((tabuleiro-topo-preenchido-p (estado-tabuleiro prox-estado))
+				   ;	(continue))
 				   (t (progn
 				   		(setf prox-res (procura-pp (make-problema 
 				   										:estado-inicial prox-estado
@@ -452,17 +457,17 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 200 fronteira-informada))
+	  										(cdr (first-n-elements 80 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
 
-(defun custo-oportunidade2 (estado)
+	(defun custo-oportunidade2 (estado)
 	(let* ((custo-op 0))
 		(loop for i in (estado-pecas-colocadas estado) do
 			(setf custo-op (+ custo-op (pontos-maximo-por-peca i))))
-		(- custo-op (estado-pontos estado))))
-
+		(* 1 (- custo-op (estado-pontos estado)))))
+	
 (defun procura-best (tab lista-pecas)
 	(let* ((estado (make-estado :tabuleiro tab 
 								:pecas-por-colocar lista-pecas))
@@ -473,6 +478,9 @@
 								:resultado #'resultado
 								:custo-caminho #'custo-oportunidade2)))
 		(procura-A*-best problema #'main-h)))
+
+
+			
 
 
 (defun first-n-elements (a b)
@@ -490,7 +498,7 @@
 		   (altura-media 0))
 		(dotimes (n (largura-matriz tab))
 			(setf altura-media (+ altura-media (tabuleiro-altura-coluna tab n))))
-		(* 8000 (/ altura-media (largura-matriz tab)))))
+		(* 10 (/ altura-media (largura-matriz tab)))))
 
 (defun h2-espacos-vazios (estado)
 	(let* ((tab (estado-tabuleiro estado))
@@ -509,7 +517,7 @@
 		(dotimes (n (- (largura-matriz tab) 1))
 			(setf bumps (+ bumps (abs (- (tabuleiro-altura-coluna tab n)
 									(tabuleiro-altura-coluna tab (+ n 1)))))))
-		(* 50 bumps)))
+		(* 10 bumps)))
 
 
 (defun main-h (estado)
@@ -524,4 +532,3 @@
 
 
 (load "utils.fas")
-
