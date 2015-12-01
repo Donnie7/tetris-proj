@@ -585,14 +585,15 @@
 		
 		;(h3-bumps-with-one-hole estado)
 		;(h3-bumps estado)))
-	 
+
+(setf var-h1-peso 0) 	 
 
 (defun main-h (estado)
 	(let* ((total 0)
 		  (len-lista-pecas (length (estado-pecas-por-colocar estado)))
 		 (peso-h1 (if (< len-lista-pecas 10) 
-		 				100 ;lista pecas a terminar
-		 				50)) ;lista de pecas grande
+		 				var-h1-peso ;lista pecas a terminar
+		 				var-h1-peso)) ;lista de pecas grande
 		 (peso-h2 500)       ;buracos
 		 (peso-h3-a 100)      ;bumps normal
 		 (peso-h3-b 150)     ;bumps-hole total
