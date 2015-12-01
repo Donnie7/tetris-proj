@@ -17,14 +17,13 @@
 
 
 
-(defvar ge1 (make-estado :tabuleiro gt1 
-						:pecas-por-colocar (random-pecas 10)))
+(defvar ge1 (make-estado :tabuleiro gt1 :pecas-por-colocar '(i z s t l o i z s z o o i t t z l z s t l o i z s z o o)))
 
 
 
 
-(defvar gp1
-	(make-problema :estado-inicial (make-estado :tabuleiro t1 :pecas-por-colocar '(i j t))
+(defvar gp1 
+	(make-problema :estado-inicial ge1
 				   :solucao #'solucao
 				   :accoes #'accoes
 				   :resultado #'resultado
