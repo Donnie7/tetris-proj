@@ -493,7 +493,7 @@
 													:resultado (problema-resultado problema)
 													:custo-caminho (problema-custo-caminho problema))
 	  										heuristica
-	  										(cdr (first-n-elements 30 fronteira-informada))
+	  										(cdr (first-n-elements 50 fronteira-informada))
 	  										(third (first fronteira-informada)))))))))
 	(procura-A*-aux-best problema heuristica nil nil))
 
@@ -587,6 +587,7 @@
 		;(h3-bumps estado)))
 
 (setf var-h1-peso 0) 	 
+(setf var-h2-peso 0) 	 
 
 (defun main-h (estado)
 	(let* ((total 0)
@@ -594,7 +595,7 @@
 		 (peso-h1 (if (< len-lista-pecas 10) 
 		 				var-h1-peso ;lista pecas a terminar
 		 				var-h1-peso)) ;lista de pecas grande
-		 (peso-h2 500)       ;buracos
+		 (peso-h2 var-h2-peso)       ;buracos
 		 (peso-h3-a 100)      ;bumps normal
 		 (peso-h3-b 150)     ;bumps-hole total
 		 (peso-h3-c 20))     ;altura hole
