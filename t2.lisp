@@ -1,4 +1,5 @@
-(load "proj.lisp")
+;(load "proj.lisp")
+;(load "proj.fas")
 
 ;tabuleiro vazio
 (defvar gt1 (cria-tabuleiro)) 
@@ -72,32 +73,63 @@
 		   (pontosTotal 0)
 		   (escala-h1 50)
 		   (escala-h2 100))
-	(loop
-		(when (> var-h1-peso 8000) (return))
-	(loop
-		(when (> var-h2-peso 10000) (return))
-		  (progn
-		    (format t "teste com peso 1: ~D; ~%" var-h1-peso)
-		    (format t "teste com peso 2: ~D; " var-h2-peso)
-		  	(setf pontos1 (executa-jogadas-sem-output ge1 (procura-best gt1 50pecas)))
-		  	(format t "pontos1: ~D; " pontos1)
-		  	(setf pontos2 (executa-jogadas-sem-output ge2 (procura-best gt2 50pecas)))
-		  	(format t "pontos2: ~D; " pontos2)
-			(setf pontos3 (executa-jogadas-sem-output ge3 (procura-best gt3 50pecas)))
-		  	(format t "pontos3: ~D; ~%" pontos3)
-		  	(setf soma (+ pontos1 pontos2 pontos3)))
-		  	(if (> soma pontosTotal)
-		  		(progn
-		  			(format t "   -> Novo maximo encontrado: ~D; p1: ~D; p2: ~D; p3: ~D; ~%" soma pontos1 pontos2 pontos3)
-		  			(setf pontosTotal soma)
-		  			(setf melhor-peso1 var-h1-peso)
-		  			(setf melhor-peso2 var-h2-peso)
-		  			(setf var-h1-peso (+ escala-h1 var-h1-peso))
-		  			(setf var-h2-peso (+ escala-h2 var-h2-peso)))
-		  		(progn
-		  			(format t "Nao foi encontrado novo maximo: p1: ~D; p2: ~D; p3: ~D; ~%" pontos1 pontos2 pontos3)
-		  			(setf var-h1-peso (+ escala-h1 var-h1-peso))
-		  			(setf var-h2-peso (+ escala-h1 var-h2-peso))))))
+	(loop (when (> var-h2-peso 5000) (return))
+		(loop (when (> var-h1-peso 9000) (return))
+			  (progn
+			    (format t "teste com peso 1: ~D; ~%" var-h1-peso)
+			    (format t "teste com peso 2: ~D; " var-h2-peso)
+			  	(setf pontos1 (executa-jogadas-sem-output ge1 (procura-best gt1 50pecas)))
+			  	(format t "pontos1: ~D; " pontos1)
+			  	(setf pontos2 (executa-jogadas-sem-output ge2 (procura-best gt2 50pecas)))
+			  	(format t "pontos2: ~D; " pontos2)
+				(setf pontos3 (executa-jogadas-sem-output ge3 (procura-best gt3 50pecas)))
+			  	(format t "pontos3: ~D; ~%" pontos3)
+			  	(setf soma (+ pontos1 pontos2 pontos3)))
+			  	(if (> soma pontosTotal)
+			  		(progn
+			  			(format t "   -> Novo maximo encontrado: ~D; p1: ~D; p2: ~D; p3: ~D; ~%" soma pontos1 pontos2 pontos3)
+			  			(setf pontosTotal soma)
+			  			(setf melhor-peso1 var-h1-peso)
+			  			(setf melhor-peso2 var-h2-peso))
+			  		(progn
+			  			(format t "Nao foi encontrado novo maximo: p1: ~D; p2: ~D; p3: ~D; ~%" pontos1 pontos2 pontos3)))
+			  	(setf var-h1-peso (+ escala-h1 var-h1-peso)))
+		(setf var-h1-peso 0)
+		(setf var-h2-peso (+ escala-h2 var-h2-peso)))
 	(cons pontosTotal (cons melhor-peso1 melhor-peso2))))
-		  	
-		  	
+	
+	
+(defun improve2 ()
+	(let* ((pontos1 0)
+		   (pontos2 0) 
+		   (pontos3 0)
+		   (soma 0)
+		   (melhor-peso3 0)
+		   (melhor-peso4 0)
+		   (pontosTotal 0)
+		   (escala-h3 50)
+		   (escala-h4 100))
+	(loop (when (> var-h4-peso 5000) (return))
+		(loop (when (> var-h3-peso 9000) (return))
+			  (progn
+			    (format t "teste com peso 3: ~D; ~%" var-h3-peso)
+			    (format t "teste com peso 4: ~D; " var-h4-peso)
+			  	(setf pontos1 (executa-jogadas-sem-output ge1 (procura-best gt1 50pecas)))
+			  	(format t "pontos1: ~D; " pontos1)
+			  	(setf pontos2 (executa-jogadas-sem-output ge2 (procura-best gt2 50pecas)))
+			  	(format t "pontos2: ~D; " pontos2)
+				(setf pontos3 (executa-jogadas-sem-output ge3 (procura-best gt3 50pecas)))
+			  	(format t "pontos3: ~D; ~%" pontos3)
+			  	(setf soma (+ pontos1 pontos2 pontos3)))
+			  	(if (> soma pontosTotal)
+			  		(progn
+			  			(format t "   -> Novo maximo encontrado: ~D; p1: ~D; p2: ~D; p3: ~D; ~%" soma pontos1 pontos2 pontos3)
+			  			(setf pontosTotal soma)
+			  			(setf melhor-peso3 var-h3-peso)
+			  			(setf melhor-peso4 var-h4-peso))
+			  		(progn
+			  			(format t "Nao foi encontrado novo maximo: p1: ~D; p2: ~D; p3: ~D; ~%" pontos1 pontos2 pontos3)))
+			  	(setf var-h3-peso (+ escala-h3 var-h3-peso)))
+		(setf var-h3-peso 0)
+		(setf var-h4-peso (+ escala-h4 var-h4-peso)))
+	(cons pontosTotal (cons melhor-peso3 melhor-peso4))))
