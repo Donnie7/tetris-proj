@@ -586,8 +586,8 @@
 		;(h3-bumps-with-one-hole estado)
 		;(h3-bumps estado)))
 
-(setf var-h1-peso 3450) 	 
-(setf var-h2-peso 400) 	 
+(setf var-h1-peso 100) 	 
+(setf var-h2-peso 500) 	 
 (setf var-h3-peso 0) 	 
 (setf var-h4-peso 0) 	 
 
