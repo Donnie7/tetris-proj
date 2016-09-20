@@ -586,8 +586,8 @@
 		;(h3-bumps-with-one-hole estado)
 		;(h3-bumps estado)))
 
-(setf var-h1-peso 100) 	 
-(setf var-h2-peso 500) 	 
+(setf var-h1-peso 200) 	;200 
+(setf var-h2-peso 900) 	;900
 (setf var-h3-peso 0) 	 
 (setf var-h4-peso 0) 	 
 
@@ -598,8 +598,8 @@
 		 				var-h1-peso ;lista pecas a terminar
 		 				var-h1-peso)) ;lista de pecas grande
 		 (peso-h2 var-h2-peso)       ;buracos
-		 (peso-h3-a 100)      ;bumps normal
-		 (peso-h3-b 150)     ;bumps-hole total
+		 (peso-h3-a var-h3-peso)      ;bumps normal
+		 (peso-h3-b var-h4-peso)     ;bumps-hole total
 		 (peso-h3-c 20))     ;altura hole
 		(setf total (+ (h1-menor-altura estado peso-h1)
 						(h2-espacos-vazios estado peso-h2)

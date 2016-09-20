@@ -133,3 +133,105 @@
 		(setf var-h3-peso 0)
 		(setf var-h4-peso (+ escala-h4 var-h4-peso)))
 	(cons pontosTotal (cons melhor-peso3 melhor-peso4))))
+	
+	
+(defun improve3 ()
+	(let* ((lista-pesos (list var-h1-peso var-h2-peso var-h3-peso var-h4-peso))
+		   (pontos1 0)
+		   (pontos2 0) 
+		   (pontos3 0)
+		   (soma 0)
+		   (melhor-peso1 0)
+		   (melhor-peso2 0)
+		   (melhor-peso3 0)
+		   (melhor-peso4 0)
+		   (topo-h1 3000)
+		   (topo-h2 3000)
+		   (topo-h3 3000)
+		   (topo-h4 3000)
+		   (pontosTotal 0)
+		   (escala 500)
+		   (n 0))
+		(loop
+			(if (> n 3) (setf n 0))
+			(loop for i in lista-pesos do
+			 	(progn
+	 				(loop 
+	 					(when (< i 0) (return))
+	 					(format t "list inicial: ")
+	 					(print lista-pesos)(format t "~%")
+	 					(setf pontos1 (executa-jogadas-sem-output ge1 (procura-best gt1 50pecas)))
+					  	(format t "pontos1: ~D; " pontos1)
+					  	(setf pontos2 (executa-jogadas-sem-output ge2 (procura-best gt2 50pecas)))
+					  	(format t "pontos2: ~D; " pontos2)
+						(setf pontos3 (executa-jogadas-sem-output ge3 (procura-best gt3 50pecas)))
+					  	(format t "pontos3: ~D; ~%" pontos3)
+					  	(setf soma (+ pontos1 pontos2 pontos3))
+	 					(if (> soma pontosTotal)
+					  		(progn
+								(setf pontosTotal soma)
+								(cond ((= 0 n)
+									(progn
+							  			(setf melhor-peso1 var-h1-peso)
+							  			(setf var-h1-peso (- var-h1-peso escala))
+							  			
+							  			
+							  			(if (< var-h1-peso 0) (setf var-h1-peso topo-h1))
+							  			(setf (first lista-pesos) var-h1-peso)))
+						  			((= 1 n)
+									(progn
+							  			(setf melhor-peso2 var-h2-peso)
+							  			(setf var-h2-peso (- var-h2-peso escala))
+							  			
+							  			
+							  			(if (< var-h2-peso 0) (setf var-h2-peso topo-h2))
+							  			(setf (second lista-pesos) var-h2-peso)))
+						  			((= 2 n)
+									(progn
+							  			(setf melhor-peso3 var-h3-peso)
+							  			(setf var-h3-peso (- var-h3-peso escala))
+							  			
+							  			
+							  			(if (< var-h3-peso 0) (setf var-h3-peso topo-h3))
+							  			(setf (third lista-pesos) var-h3-peso)))
+						  			((= 3 n)
+									(progn
+							  			(setf melhor-peso4 var-h4-peso)
+							  			(setf var-h4-peso (- var-h4-peso escala))
+							  			
+							  			
+							  			(if (< var-h4-peso 0) (setf var-h4-peso topo-h1))
+							  			(setf (fourth lista-pesos) var-h4-peso))))
+						  			(format t "   -> Novo maximo encontrado: ~D; p1: ~D; p2: ~D; p3: ~D; ~%" soma pontos1 pontos2 pontos3)
+						  			(format t "list seguinte: ")
+						  			(print lista-pesos)(format t "~%"))
+							(progn
+	  							(format t "Nao foi encontrado novo maximo: p1: ~D; p2: ~D; p3: ~D; ~%" pontos1 pontos2 pontos3)
+	  							(cond ((= 0 n)
+	  								(progn
+	  									(setf var-h1-peso (- var-h1-peso escala))
+	  									
+							  			(if (< var-h1-peso 0) (setf var-h1-peso topo-h1))
+							  			(setf (first lista-pesos) var-h1-peso)))
+						  			((= 1 n)
+						  			(progn
+	  									(setf var-h2-peso (- var-h2-peso escala))
+	  									
+							  			(if (< var-h2-peso 0) (setf var-h2-peso topo-h2))
+							  			(setf (second lista-pesos) var-h2-peso)))
+						  			((= 2 n)
+						  			(progn
+	  									(setf var-h3-peso (- var-h3-peso escala))
+	  									
+							  			(if (< var-h3-peso 0) (setf var-h3-peso topo-h3))
+							  			(setf (third lista-pesos) var-h3-peso)))
+						  			((= 3 n)
+						  			(progn
+	  									(setf var-h4-peso (- var-h4-peso escala))
+	  									
+							  			(if (< var-h4-peso 0) (setf var-h4-peso topo-h4))
+							  			(setf (fourth lista-pesos) var-h4-peso))))
+							  	(format t "list seguinte: ")
+						  			(print lista-pesos)(format t "~%")))))
+				(incf n 1)))))
+					  		
